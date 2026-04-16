@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Portal | Gateway</title>
+    <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+    <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: var(--input-bg, #fff7ed);
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+
+        .status-approved {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .approval-card {
+            background: var(--bg-color, #f8fafc);
+            border-left: 3px solid var(--btn-color, #f50e06);
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 0 4px 4px 0;
+            font-size: 13px;
+        }
+    </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body class="notif-page-bg">
+    <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 40px;">
+        <a href="{% url 'project_review:home' %}"
+            style="color:var(--btn-color, #f50e06); text-decoration:none; font-weight: 800; font-size: 16px;">&lt; Back</a>
+        <div class="logo">
+            <img src="{% static 'project_review/images/logo.png' %}" alt="Logo" style="height: 45px;">
+        </div>
+    </nav>
+
+    <div class="content-wrap" style="padding: 60px 20px;">
+        <div class="notif-header-center">
+            <h2>Your Registration Portal</h2>
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px;">View all your submissions and investor
+                responses</p>
+        </div>
+
+        <div class="notif-layout" style="max-width: 900px;">
+            <div class="notif-list-col">
+                {% for item in reg_data %}
+                <div class="notif-card-alt" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="notif-avatar"
+                                style="background: #f1f5f9; color: var(--text-color, #334155); border: 1px solid var(--card-border, #e2e8f0);">
+                                {{ item.registration.startup_name|slice:":1" }}
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px;">{{ item.registration.startup_name }}</h3>
+                                <p style="margin: 2px 0 0 0; color: #64748b; font-size: 12px;">ID: #{{
+                                    item.registration.registration_number }} | Submitted {{
+                                    item.registration.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            {% if item.is_approved %}
+                            <span class="status-badge status-approved">Approved by Investor</span>
+                            {% else %}
+                            <span class="status-badge status-pending">Under Review</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                        <p style="margin: 0; font-size: 13px; color: var(--sub-text, #475569);">
+                            <strong>Category:</strong> {{ item.registration.category }} | <strong>Target:</strong> {{
+                            item.registration.company_name|default:"General Community" }}
+                        </p>
+                    </div>
+
+                    {% if item.notifications %}
+                    <div style="width: 100%; margin-top: 5px;">
+                        <h4 style="font-size: 11px; text-transform: uppercase; color: #94a3b8; margin: 0 0 8px 0;">
+                            Updates & Activity</h4>
+                        {% for n in item.notifications %}
+                        <div class="approval-card">
+                            <p style="margin: 0;"><strong>{{ n.sender_name }}</strong>: {{ n.text }}</p>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #94a3b8;">{{ n.timestamp|date:"F d,
+                                H:i" }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 10px; gap: 10px;">
+                        <a href="{% url 'project_review:startup_invoice' %}?id={{ item.registration.id }}"
+                            class="notif-action-btn secondary" style="padding: 6px 15px; font-size: 12px;">View Full
+                            Invoice</a>
+                        <a href="{% url 'project_review:portal' %}" class="notif-action-btn primary"
+                            style="padding: 6px 15px; font-size: 12px;">Access Portal</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div
+                    style="text-align: center; padding: 60px; background: var(--card-bg, white); border-radius: 8px; border: 1px solid var(--card-border, #e2e8f0);">
+                    <p style="color: #64748b;">You haven't submitted any startup ideas yet.</p>
+                    <a href="{% url 'project_review:share_ideas' %}" class="notif-action-btn primary"
+                        style="margin-top: 15px;">Share Your First Idea</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-left">© MyWorld</div>
+            <div class="footer-right">
+                <span>Contact: +91 0123456789</span>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

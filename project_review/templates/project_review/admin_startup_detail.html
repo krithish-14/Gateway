@@ -1,0 +1,198 @@
+{% extends 'project_review/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<a href="{% url 'project_review:admin_startup_list' %}" class="btn-view"
+    style="margin-bottom: 2rem; background: transparent; border-color: rgba(255,255,255,0.1); color: var(--text-muted);">
+    &larr; Back to Startup Database
+</a>
+
+<div class="stat-card" style="padding: 3rem;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <div>
+            <div
+                style="font-size: 0.75rem; color: var(--primary-red); text-transform: uppercase; font-weight: 800; letter-spacing: 0.2em; margin-bottom: 8px;">
+                Startup Identity</div>
+            <h1
+                style="font-size: 3rem; margin: 0; font-weight: 800; color: #fff; letter-spacing: -0.03em; line-height: 1;">
+                {{ startup.startup_name }}
+            </h1>
+            <p style="color: var(--text-muted); margin: 0.75rem 0 0; font-size: 1rem;">Comprehensive assessment for the
+                Gateway Program</p>
+        </div>
+        <div
+            style="background: rgba(245, 14, 6, 0.1); color: var(--primary-red); padding: 0.5rem 1rem; border-radius: 1rem; font-weight: 700; font-family: monospace; font-size: 1.1rem;">
+            #{{ startup.registration_number }}
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;">
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Founder
+                Name</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{{ startup.first_name }} {{ startup.last_name }}</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Email
+                Address</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{{ startup.email }}</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Category</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{{ startup.category }}</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Team
+                Size</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{{ startup.team_size }} Members</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Submitted
+                On</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{{ startup.created_at|date:"F d, Y @ H:i" }}</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Portal
+                User</label>
+            <div style="font-size: 1.1rem; font-weight: 500;">{% if startup.user %}{{ startup.user.username }}{% else
+                %}Not Linked{% endif %}</div>
+        </div>
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">
+                Authenticity Score
+            </label>
+            <div
+                style="font-size: 2.5rem; font-weight: 800; color: {% if startup.idea_authenticity_score >= 80 %}#34d399{% elif startup.idea_authenticity_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
+                {{ startup.idea_authenticity_score|default:0 }}%
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">{{ startup.project_verification_status }}</p>
+        </div>
+
+        <div class="info-item">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">
+                Idea Originality
+            </label>
+            <div style="font-size: 1.1rem; font-weight: 500;">
+                {{ startup.idea_status }}
+                <span style="color: var(--text-muted); font-size: 0.8rem;">({{ startup.idea_similarity_score }}/10
+                    Similarity Score)</span>
+            </div>
+            <button id="trigger-verify-btn" data-id="{{ startup.id }}"
+                style="margin-top: 10px; padding: 6px 12px; background: var(--primary-red); border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.75rem; font-weight: 700;">
+                Run Full Verification Check
+            </button>
+        </div>
+
+        <div style="grid-column: 1 / -1; margin-top: 1rem;">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">
+                Verification Report
+            </label>
+            <div
+                style="background: rgba(255, 255, 255, 0.03); border-radius: 1rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.05);">
+                <p><strong>Keywords:</strong> {{ startup.generated_keywords|default:"Not analyzed" }}</p>
+                <p><strong>Status:</strong> {{ startup.project_verification_status }}</p>
+                <p><strong>Recommended Action:</strong> {{ startup.recommended_action }}</p>
+                {% if startup.extracted_summary_text %}
+                <details style="margin-top: 1rem; color: var(--text-muted);">
+                    <summary style="cursor: pointer; font-size: 0.85rem;">View Extracted Summary Text</summary>
+                    <div
+                        style="margin-top: 0.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem; font-size: 0.85rem; max-height: 200px; overflow-y: auto;">
+                        {{ startup.extracted_summary_text }}
+                    </div>
+                </details>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if startup.startup_idea_report or startup.patent_file %}
+        <div style="grid-column: 1 / -1; margin-top: 1rem; display: flex; gap: 1rem;">
+            {% if startup.startup_idea_report %}
+            <a href="{{ startup.startup_idea_report.url }}" target="_blank" class="btn-view"
+                style="padding: 1rem 2rem; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
+                View Idea Report &rarr;
+            </a>
+            {% endif %}
+            {% if startup.patent_file %}
+            <a href="{{ startup.patent_file.url }}" target="_blank" class="btn-view"
+                style="padding: 1rem 2rem; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); font-size: 0.9rem;">
+                View Patent Certificate &rarr;
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if startup.team_members.all %}
+    <div style="margin-top: 3rem;">
+        <label
+            style="color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;">Team
+            Members</label>
+        <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem;">
+            {% for member in startup.team_members.all %}
+            <div
+                style="background: rgba(255,255,255,0.05); padding: 0.75rem 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight: 600;">{{ member.name }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ member.email }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('trigger-verify-btn');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                const startupId = btn.getAttribute('data-id');
+                const originalText = btn.innerText;
+
+                // Disable button and show loading
+                btn.disabled = true;
+                btn.innerText = 'Triggering...';
+                btn.style.opacity = '0.5';
+
+                fetch(`/api/verify/startup_reg/${startupId}/trigger/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status) {
+                            alert('Verification task has been queued. Please refresh the page in a few moments to see the updated scores.');
+                            btn.innerText = 'Task Queued ✓';
+                            btn.style.background = '#059669'; // Success green
+                        } else if (data.error) {
+                            alert('Error: ' + data.error);
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                            btn.style.opacity = '1';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An unexpected error occurred.');
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                        btn.style.opacity = '1';
+                    });
+            });
+        }
+    });
+</script>
+{% endblock %}

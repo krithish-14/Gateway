@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="{% url 'project_review:home' %}" style="color: var(--btn-color, #f50e06); text-decoration: none; margin-left:8px; font-weight: bold;">&lt; Back</a>
+    <div class="logo"><img src="{% static 'project_review/images/logo.png' %}" alt="Logo"></div>
+  </nav>
+
+
+
+  <footer>
+    <p>© About Us</p>
+  </footer>
+</body>
+
+</html>

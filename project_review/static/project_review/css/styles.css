@@ -1,0 +1,482 @@
+:root {
+  --bg-color: #ffffff;
+  --text-color: #0f172a;
+  --navbar-bg: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --header-text: #000000;
+  --sub-text: #64748b;
+  --btn-color: #f50e06;
+  --input-bg: #fcfcfc;
+  --input-border: #ddd;
+}
+
+[data-theme='dark'] {
+  --bg-color: #020617;
+  --text-color: #f8fafc;
+  --navbar-bg: #000000;
+  --card-bg: #0f172a;
+  --card-border: #1e293b;
+  --header-text: #ffffff;
+  --sub-text: #94a3b8;
+  --btn-color: #f50e06;
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --navbar-bg: #000000;
+  --navbar-border: #f50e06;
+}
+
+/* Enforce black background and red border line for header in dark mode */
+[data-theme='dark'] .navbar {
+  background-color: #000000 !important;
+  border-bottom: 2px solid #f50e06 !important;
+}
+
+
+/* Login container */
+.pos {
+    background-color: var(--card-bg, #fff);
+    width: 400px;
+    max-width: 90%;
+    margin: auto;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border, #ddd);
+}
+
+/* Login button */
+#button {
+    text-align: center;
+    border: 1px solid var(--btn-color, red);
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: var(--card-bg, white);
+    color: var(--btn-color, red);
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+#button:hover {
+    background-color: red;
+    color: white;
+    cursor: pointer;
+}
+
+/* All input fields */
+input {
+    width: 90%;
+    padding: 6px 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--input-border, #ccc);
+    border-radius: 4px;
+    background-color: var(--input-bg, white);
+    color: var(--text-color, #000);
+}
+
+/* Full Page Styling */
+#body2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, rgba(0, 0, 0, 0.05) 0%, var(--bg-color, #ffffff) 100%);
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+}
+
+[data-theme='dark'] #body2 {
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05) 0%, #0a0a0a 100%);
+}
+
+.login-page-container {
+    display: flex;
+    flex-direction: row;
+    width: 1100px;
+    max-width: 95%;
+    gap: 80px;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.info-side {
+    flex: 1;
+    color: var(--text-color, #0f172a);
+    animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 45px;
+    color: var(--text-color, #0f172a);
+    letter-spacing: -0.03em;
+}
+
+.info-features {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.1rem;
+    color: var(--sub-text, #64748b);
+}
+
+.feature-bullet {
+    width: 6px;
+    height: 6px;
+    background-color: var(--btn-color, #f50e06);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.login-side {
+    flex: 0 0 420px;
+    animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 1000px) {
+    .login-page-container {
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+        gap: 50px;
+        padding-top: 60px;
+    }
+
+    .info-title {
+        font-size: 2.5rem;
+    }
+
+    .feature-item {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .login-side {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* Container Styling (White Login Card) */
+.pos2 {
+    background-color: var(--card-bg, #fff);
+    width: 100%;
+    max-width: 450px;
+    padding: 50px 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+}
+
+/* Heading Styling */
+.pos2 h2 {
+    color: var(--primary-red, #f50e06);
+    margin-bottom: 20px;
+}
+
+/* Input, Textarea, and Select Field Styling (Create Account page) */
+.pos2 input,
+.pos2 textarea,
+.pos2 select {
+    width: 100%;
+    padding: 10px 12px;
+    margin: 5px 0;
+    /* Reduced margin for tighter spacing */
+    border: 1px solid var(--input-border, #ddd);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: var(--input-bg, white);
+    color: var(--text-color, #000);
+}
+
+.pos2 input:focus,
+.pos2 textarea:focus,
+.pos2 select:focus {
+    outline: none;
+    border-color: var(--primary-red, #f50e06);
+    box-shadow: 0 0 0 3px rgba(245, 14, 6, 0.1);
+}
+
+/* Dynamic Field Animation */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ensure button matches full width layout inside pos2 */
+.pos2 button {
+    width: 100%;
+}
+
+/* Notice messages block spacing */
+.notice {
+    margin-bottom: 12px;
+}
+
+/* Main body styling */
+#body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Splash overlay (Liquid Glass Style - Nature Theme) */
+#splash {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Base background: Deep cinematic dark matching login page */
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05) 0%, #0a0a0a 100%);
+}
+
+/* The Liquid Background Layer (Luxurious White & Grey Mix) */
+#splash::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background:
+        radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.15), transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(45, 45, 45, 0.8), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(200, 200, 200, 0.1), transparent 50%),
+        linear-gradient(135deg, #121212 0%, #2a2a2a 100%);
+    background-size: 150% 150%;
+    animation: liquidAnimate 25s ease-in-out infinite alternate;
+    opacity: 1;
+}
+
+/* High-Interactive Card */
+.splash-card {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px;
+    border-radius: 40px;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+
+    /* Deepest Black Glass with Interactive Glow */
+    background:
+        radial-gradient(600px circle at var(--card-mouse-x, 50%) var(--card-mouse-y, 50%), rgba(255, 255, 255, 0.04), transparent 40%),
+        rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(40px) saturate(100%);
+    -webkit-backdrop-filter: blur(40px) saturate(100%);
+
+    /* Stealth Border */
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 1);
+
+    overflow: visible;
+    transition: transform 0.1s ease-out, box-shadow 0.4s ease;
+}
+
+.splash-text {
+    position: absolute;
+    bottom: 45px;
+    /* Moved higher up inside the card */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    color: white !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+
+
+@keyframes liquidAnimate {
+    0% {
+        transform: rotate(0deg) scale(1);
+        background-position: 0% 50%;
+    }
+
+    50% {
+        transform: rotate(3deg) scale(1.1);
+        background-position: 100% 50%;
+    }
+
+    100% {
+        transform: rotate(-3deg) scale(1);
+        background-position: 0% 50%;
+    }
+}
+
+#splash-logo {
+    display: block;
+    width: 350px;
+    height: auto;
+    cursor: pointer;
+    /* Pop the logo off the glass */
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#splash-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Dismiss Animation */
+#splash.dismiss {
+    animation: splashFadeOut 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes splashFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+        filter: blur(10px);
+        visibility: hidden;
+    }
+}
+
+.company-listings {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.company-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    position: relative;
+}
+
+.company-card.promoted {
+    border-color: #ffc107;
+}
+
+.promoted-badge {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background-color: #ffc107;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.company-logo img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.company-details h4 {
+    margin: 0 0 8px;
+}
+
+.company-details p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.company-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.rating-value {
+    background-color: #ffc107;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.company-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.company-save a {
+    color: #007bff;
+    text-decoration: none;
+}

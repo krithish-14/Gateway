@@ -1,0 +1,241 @@
+{% extends 'project_review/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+    <li>
+        <a href="{% url 'project_review:admin_investor_list' %}" class="btn-view"
+            style="background: transparent; border-color: rgba(255,255,255,0.1); color: var(--text-muted);">
+            &larr; Back to Investor Profiles
+        </a>
+    </li>
+</ul>
+
+<div class="stat-card" style="padding: 3rem;">
+    <div
+        style="display: flex; align-items: center; gap: 2rem; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <div
+            style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.05); border-radius: 1.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);">
+            {% if company.logo %}
+            <img src="{{ company.logo.url }}" style="width: 80%; height: 80%; object-fit: contain;">
+            {% else %}
+            <div style="font-size: 2rem; font-weight: 700; color: rgba(255, 255, 255, 0.1);">{{ company.name|first }}
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            <h1 style="font-size: 2.5rem; margin: 0; font-weight: 700;">{{ company.name }}</h1>
+            <div style="display: flex; align-items: center; gap: 15px; margin-top: 0.5rem;">
+                <p style="color: var(--text-muted); margin: 0;">Investment Firm Profile</p>
+                {% with strength=profile.completion_percentage|default:company.completion_percentage %}
+                <span style="background: rgba({% if strength >= 80 %}52, 211, 153{% else %}245, 158, 11{% endif %}, 0.1); 
+                             color: {% if strength >= 80 %}#34d399{% else %}#f59e0b{% endif %}; 
+                             padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                    Strength: {{ strength|floatformat:0 }}%
+                </span>
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;">
+        <!-- Left: Basic Info -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="info-item">
+                <label
+                    style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Primary
+                    Contact</label>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    {% if user %}
+                    <div
+                        style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-red); display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 500;">{{ user.get_full_name|default:user.username }}
+                    </div>
+                    {% else %}
+                    <div style="color: var(--text-muted);">Unassigned</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <label
+                    style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Role
+                    in Firm</label>
+                <div style="font-size: 1.1rem; font-weight: 500;">{{ company.role_in_company|default:"Principal" }}
+                </div>
+            </div>
+            <div class="info-item">
+                <label
+                    style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Email
+                    Address</label>
+                <div style="font-size: 1.1rem; font-weight: 500;">{{ user.email|default:"N/A" }}</div>
+            </div>
+            <div class="info-item">
+                <label
+                    style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Focus
+                    / Category</label>
+                <div style="font-size: 1.1rem; font-weight: 500; color: #34d399;">{{ company.category|default:"General
+                    Investment" }}</div>
+            </div>
+        </div>
+
+        <!-- Right: Verification & Trust Score -->
+        <div
+            style="background: rgba(255, 255, 255, 0.02); border-radius: 1.5rem; padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.05);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <label
+                    style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 1rem;">Trust
+                    Score Overview</label>
+                <div
+                    style="font-size: 4rem; font-weight: 800; color: {% if company.trust_score >= 80 %}#34d399{% else %}#f59e0b{% endif %}; line-height: 1;">
+                    {{ company.trust_score|default:0 }}%
+                </div>
+                <div style="margin-top: 10px; font-weight: 600; color: var(--text-muted);">
+                    Status: {{ company.verification_status|default:"Pending Review" }}
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <span style="font-size: 0.9rem;">LinkedIn Verification</span>
+                    {% if company.linkedin_verified %}
+                    <span style="color: #34d399; font-weight: 700; font-size: 0.8rem;">✓ VERIFIED</span>
+                    {% else %}
+                    <span style="color: #f59e0b; font-weight: 700; font-size: 0.8rem;">PENDING</span>
+                    {% endif %}
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <span style="font-size: 0.9rem;">Website Status</span>
+                    <span
+                        style="color: {% if company.website_verified %}#34d399{% else %}#f59e0b{% endif %}; font-weight: 700; font-size: 0.8rem;">{{
+                        company.website_status|default:"Checking..." }}</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <span style="font-size: 0.9rem;">GST / Invoice Verification</span>
+                    {% if company.gst_verified %}
+                    <span style="color: #34d399; font-weight: 700; font-size: 0.8rem;">✓ VERIFIED</span>
+                    {% else %}
+                    <span
+                        style="color: {% if company.gst_invoice %}#f59e0b{% else %}#f50e06{% endif %}; font-weight: 700; font-size: 0.8rem;">
+                        {% if company.gst_invoice %}MANUAL REVIEW REQ{% else %}MISSING{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+                    <span style="font-size: 0.9rem;">Admin Approval</span>
+                    {% if company.admin_approved %}
+                    <span style="color: #34d399; font-weight: 700; font-size: 0.8rem;">✓ APPROVED BY STAFF</span>
+                    {% else %}
+                    <span style="color: #64748b; font-weight: 700; font-size: 0.8rem;">NO ACTION TAKEN</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button id="trigger-verify-btn" data-id="{{ company.id }}"
+                style="width: 100%; margin-top: 20px; padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: all 0.2s;">
+                Run Automated Check Again
+            </button>
+        </div>
+
+        <!-- Wide Sections -->
+        <div class="info-item" style="grid-column: 1 / -1;">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">About
+                the Firm</label>
+            <div
+                style="background: rgba(255, 255, 255, 0.03); border-radius: 1rem; padding: 1.5rem; line-height: 1.6; white-space: pre-wrap;">
+                {{ company.about }}</div>
+        </div>
+
+        <div class="info-item" style="grid-column: 1 / -1;">
+            <label
+                style="display: block; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Investment
+                Thesis / Focus Area</label>
+            <div
+                style="background: rgba(255, 255, 255, 0.03); border-radius: 1rem; padding: 1.5rem; line-height: 1.6; white-space: pre-wrap;">
+                {{ company.investment_focus }}</div>
+        </div>
+
+        <div class="info-item">
+            <a href="{{ company.website }}" target="_blank" class="btn-view"
+                style="width: 100%; text-align: center; box-sizing: border-box;">Official Website &nearrow;</a>
+        </div>
+        <div class="info-item">
+            <a href="{{ company.linkedin_profile }}" target="_blank" class="btn-view"
+                style="width: 100%; text-align: center; box-sizing: border-box;">LinkedIn Profile &rarr;</a>
+        </div>
+
+        <!-- Admin Decision Hub -->
+        <div
+            style="grid-column: 1 / -1; margin-top: 2rem; background: rgba(245, 14, 6, 0.03); border: 1px solid rgba(245, 14, 6, 0.1); border-radius: 1.5rem; padding: 2.5rem;">
+            <h2 style="margin: 0 0 1.5rem 0; font-size: 1.5rem;">Admin Verification Decision</h2>
+
+            {% if company.admin_note %}
+            <div
+                style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid var(--primary-red);">
+                <label
+                    style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px;">Previous
+                    Admin Note</label>
+                {{ company.admin_note }}
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 20px;">
+                <form action="{% url 'project_review:admin_approve_investor' company.pk %}" method="POST"
+                    style="flex: 1;">
+                    {% csrf_token %}
+                    <textarea name="note" placeholder="Add a note (optional)..."
+                        style="width: 100%; height: 80px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; padding: 12px; margin-bottom: 12px; font-family: inherit;"></textarea>
+                    <button type="submit" class="btn-red-action"
+                        style="width: 100%; padding: 16px; border-radius: 12px; background: #10b981; border: none; font-size: 1rem;">MANUALLY
+                        APPROVE INVESTOR</button>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; text-align: center;">Adds
+                        +20 Trust Points & Forces "Verified" Status</p>
+                </form>
+
+                <form action="{% url 'project_review:admin_reject_investor' company.pk %}" method="POST"
+                    style="flex: 1;">
+                    {% csrf_token %}
+                    <textarea name="note" placeholder="Reason for rejection..."
+                        style="width: 100%; height: 80px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; padding: 12px; margin-bottom: 12px; font-family: inherit;"></textarea>
+                    <button type="submit" class="btn-red-outline"
+                        style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #f50e06; color: #f50e06; background: transparent; font-size: 1rem;">MARK
+                        AS REJECTED / FRADULENT</button>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; text-align: center;">Resets
+                        Points to 0 & Displays "Rejected" Status</p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('trigger-verify-btn')?.addEventListener('click', function () {
+        const btn = this;
+        const id = btn.dataset.id;
+        btn.disabled = true;
+        btn.innerText = 'Triggering task...';
+
+        fetch(`/api/verify/investor/${id}/trigger/`)
+            .then(res => res.json())
+            .then(data => {
+                alert(data.status || data.error);
+                btn.innerText = 'Triggered Successfully';
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            })
+            .catch(err => {
+                alert('Connection error');
+                btn.disabled = false;
+                btn.innerText = 'Run Automated Check Again';
+            });
+    });
+</script>
+</div>
+{% endblock %}

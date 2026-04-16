@@ -1,0 +1,56 @@
+services:
+  web:
+    build: .
+    container_name: django_app
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DB_ENGINE=mssql
+      - DB_NAME=${DB_NAME:-GatewayDatabase}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD:-YourStrong@Password123}
+      - DB_HOST=mssql
+      - DB_PORT=1433
+      - DEBUG=0
+      - DJANGO_ALLOWED_HOSTS=*,bacon-wielder-trodden.ngrok-free.dev,localhost
+    depends_on:
+      mssql:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD:-YourStrong@Password123}
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${DB_PASSWORD:-YourStrong@Password123}", "-Q", "SELECT 1", "-C"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Ollama needs a healthcheck or a post-start command to pull models
+    # This just starts the service. We pull models via terminal or a script.
+
+volumes:
+  mssql_data:
+  ollama_data:
+  static_volume:
+  media_volume:

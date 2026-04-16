@@ -1,0 +1,84 @@
+{% for company in companies %}
+<div class="company-card">
+  <div class="company-logo">
+    {% if company.logo %}
+    <img src="{{ company.logo.url }}" alt="{{ company.name }} logo"
+      style="width: 80px; height: 80px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    {% else %}
+    <div class="logo-placeholder"
+      style="width: 80px; height: 80px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; background: linear-gradient(135deg, var(--primary-red), #ff5a5a); color: white; border: 4px solid var(--card-bg, #fff); box-shadow: 0 4px 15px rgba(245, 14, 6, 0.2);">
+      {{ company.name|slice:":1" }}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="company-details" style="flex: 1; min-width: 0;">
+    <div class="company-header"
+      style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+      <h4 style="margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em;">
+        <a href="{% url 'project_review:company_detail_dynamic' company.pk %}?return=search_domain"
+          style="text-decoration:none; color: var(--text-color, #0f172a);">{{ company.name }}</a>
+      </h4>
+      <div class="company-rating"
+        style="display: flex; align-items: center; gap: 5px; background: var(--input-bg, #fffbeb); padding: 5px 10px; border-radius: 10px; border: 1px solid var(--card-border, #fef3c7);">
+        <span style="color: #d97706; font-weight: 800; font-size: 0.95rem;">★ {{ company.rating|floatformat:1 }}</span>
+      </div>
+    </div>
+
+    <div
+      style="color: #64748b; font-size: 0.9rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-red);">
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+      {{ company.location|default:"India" }}
+    </div>
+
+    <div
+      style="background: var(--bg-color, #f8fafc); border-radius: 12px; padding: 14px; margin-bottom: 15px; border: 1px solid var(--card-border); display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div style="border-right: 1px solid var(--card-border, #e2e8f0); padding-right: 15px;">
+        <h5
+          style="margin: 0 0 4px 0; color: var(--sub-text, #64748b); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">
+          Executive Summary</h5>
+        <p style="margin: 0; font-size: 0.8rem; line-height: 1.5; color: var(--text-color, #334155);">
+          {{ company.about|truncatewords:12|default:"Strategic ecosystem partner." }}
+        </p>
+      </div>
+
+      <div>
+        <h5
+          style="margin: 0 0 4px 0; color: var(--sub-text, #64748b); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">
+          Investment Focus</h5>
+        <p style="margin: 0; font-size: 0.8rem; line-height: 1.5; color: var(--text-color, #0f172a); font-weight: 700;">
+          {{ company.investment_focus|default:"Growth Stage" }}
+        </p>
+      </div>
+    </div>
+
+    <div
+      style="display: flex; flex-direction: column; align-items: center; gap: 20px; border-top: 1.5px solid var(--card-border); padding-top: 15px; margin-top: 10px;">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+        {% if company.category %}
+        <span
+          style="background: var(--input-bg, #eff6ff); color: var(--btn-color, #1e40af); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{
+          company.category }}</span>
+        {% else %}
+        <span
+          style="background: var(--bg-color, #f1f5f9); color: var(--sub-text, #475569); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Strategic
+          Partner</span>
+        {% endif %}
+
+        {% if company.price_range %}
+        <span
+          style="background: var(--input-bg, #f0fdf4); color: #166534; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{
+          company.price_range }}</span>
+        {% endif %}
+      </div>
+      <a href="{% url 'project_review:company_detail_dynamic' company.pk %}?return=search_domain" class="search-trigger"
+        style="white-space: nowrap; font-size: 0.9rem; padding: 8px 18px; text-decoration: none; display: inline-block;">View
+        Profile</a>
+    </div>
+  </div>
+</div>
+{% endfor %}

@@ -1,0 +1,35 @@
+[
+  {
+    "idea": "An app that lets you order a taxi from your phone using GPS.",
+    "similarity_score": 9.8,
+    "angle_analysis": {
+      "technical": "Common mobile GPS integration.",
+      "market": "Saturated by Uber and Lyft.",
+      "competitive": "Direct overlap with global giants.",
+      "monetization": "Standard commission model."
+    },
+    "verdict": "Duplicate"
+  },
+  {
+    "idea": "Quantum computing based fertilizer distribution system for vertical farms.",
+    "similarity_score": 0.5,
+    "angle_analysis": {
+      "technical": "High novelty in quantum algorithm application.",
+      "market": "Niche but revolutionary for vertical farming.",
+      "competitive": "No known direct competitors using quantum tech.",
+      "monetization": "SaaS and Hardware license."
+    },
+    "verdict": "Unique"
+  },
+  {
+    "idea": "A social network for professional networking and job search.",
+    "similarity_score": 9.5,
+    "angle_analysis": {
+      "technical": "Standard web/app social graph.",
+      "market": "Dominated by LinkedIn.",
+      "competitive": "LinkedIn is the direct incumbent.",
+      "monetization": "Ads and Premium subscriptions."
+    },
+    "verdict": "Duplicate"
+  }
+]

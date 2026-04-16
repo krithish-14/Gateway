@@ -1,0 +1,124 @@
+{% extends 'project_review/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin: 0; font-size: 1.75rem;">Deleted Records Archive</h1>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">View and track users who have been removed from the
+            platform</p>
+    </div>
+    <div class="admin-stat-card" style="padding: 10px 20px;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">
+            Archived Count</div>
+        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">{{ records|length }} Record(s)</div>
+    </div>
+</div>
+
+<div class="admin-stat-card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="background: rgba(255,255,255,0.02);">
+                <th
+                    style="padding: 1.25rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; text-transform: uppercase;">
+                    User Info</th>
+                <th
+                    style="padding: 1.25rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; text-transform: uppercase;">
+                    Role & Contact</th>
+                <th
+                    style="padding: 1.25rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; text-transform: uppercase;">
+                    Credential Meta</th>
+                <th
+                    style="padding: 1.25rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; text-transform: uppercase;">
+                    Deletion Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="font-weight: 600; color: #fff;">{{ r.username }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ r.email }}</div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">Joined: {{ r.date_joined|date:"M d,
+                        Y" }}</div>
+                    <div style="font-size: 0.75rem; color: #666;">Last Login: {{ r.last_login|date:"M d,
+                        Y"|default:"Never" }}</div>
+                </td>
+                <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="margin-bottom: 4px;">
+                        {% if r.role == 'admin' %}
+                        <span
+                            style="background: rgba(245, 14, 6, 0.1); color: var(--accent-red); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">ADMIN</span>
+                        {% elif r.role == 'investor' %}
+                        <span
+                            style="background: rgba(52, 211, 153, 0.1); color: #34d399; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">INVESTOR</span>
+                        {% else %}
+                        <span
+                            style="background: rgba(96, 165, 250, 0.1); color: #60a5fa; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">STARTUP</span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.85rem; color: #eee;">{{ r.phone_number|default:"No Phone" }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ r.location|default:"No Location" }}
+                    </div>
+                </td>
+                <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    {% if r.portal_password or r.plain_text_password %}
+                    <div
+                        style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 8px;">
+                        {% if r.portal_password %}
+                        <div>
+                            <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Portal
+                                Password</div>
+                            <div style="font-family: monospace; color: #fff; font-size: 0.9rem;">{{ r.portal_password }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if r.plain_text_password %}
+                        <div>
+                            <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">
+                                Account
+                                Password</div>
+                            <div style="font-family: monospace; color: var(--accent-red); font-size: 0.9rem;">{{
+                                r.plain_text_password }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">No portal credentials</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="font-weight: 500; color: var(--accent-red);">{{ r.deleted_at|date:"M d, Y" }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">at {{
+                        r.deleted_at|date:"H:i:s" }}</div>
+
+                    <form action="{% url 'project_review:admin_restore_user' r.pk %}" method="POST"
+                        onsubmit="return confirm('Restore this user to the active platform?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-restore"
+                            style="width: 100%; justify-content: center; font-size: 0.75rem; padding: 6px 12px; gap: 6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Restore Data
+                        </button>
+                    </form>
+
+                    <div style="margin-top: 10px; font-size: 0.8rem; color: #777; font-style: italic;">
+                        Reason: {{ r.reason|default:"Administrative Action" }}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="padding: 4rem; text-align: center; color: var(--text-muted);">No deleted records
+                    found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

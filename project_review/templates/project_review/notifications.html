@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications | Gateway</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body class="notif-page-bg">
+  <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 40px;">
+    <a href="{% url 'project_review:home' %}"
+      style="color: var(--btn-color, #f50e06); text-decoration:none; font-weight: 800; font-size: 16px;">&lt; Back</a>
+    <div class="logo">
+      <img src="{% static 'project_review/images/logo.png' %}" alt="Logo" style="height: 45px;">
+    </div>
+  </nav>
+
+  <div class="content-wrap" style="padding: 60px 20px;">
+
+    <div class="notif-header-center">
+      <h2>New notifications <span class="notif-badge-alt">{{ unread_notifications_count }}</span></h2>
+    </div>
+
+    <div class="notif-layout">
+      <!-- Left Column: Actual Notifications -->
+      <div class="notif-list-col">
+        {% for notification in notifications %}
+        <div class="notif-card-alt" data-id="{{ notification.id }}" 
+          data-url="{% if notification.registration %}{% url 'project_review:startup_idea_detail' notification.registration.pk %}?return=notifications{% else %}#{% endif %}"
+          style="cursor: pointer;" onclick="handleNotifClick(event, this)">
+
+          {% if not notification.is_read %}
+          <div class="notif-status-dot"></div>
+          {% endif %}
+
+          <div class="notif-avatar">
+            {% if notification.registration.profile_image %}
+            <img src="{{ notification.registration.profile_image.url }}" alt="avatar">
+            {% else %}
+            {{ notification.sender_name|slice:":1" }}
+            {% endif %}
+          </div>
+
+          <div class="notif-content-mid">
+            <p class="notif-main-text">
+              <strong>{{ notification.sender_name }}</strong> {{ notification.text }}
+            </p>
+            <p class="notif-sub-text">{{ notification.timestamp|time:"H:i A" }}</p>
+          </div>
+
+          <div class="notif-action-links" style="position: relative; z-index: 10;">
+            {% if notification.registration %}
+            {% if request.user == notification.registration.user %}
+            <!-- Startup View: Portal Login + Registration Success Link -->
+            <div style="display: flex; gap: 8px;">
+              <a href="{% url 'project_review:portal' %}" class="notif-action-btn primary"
+                style="text-decoration: none;">Personal Portal</a>
+              <a href="{% url 'project_review:startup_invoice' %}{% if notification.registration %}?id={{ notification.registration.id }}{% endif %}"
+                class="notif-action-btn secondary" style="text-decoration: none;">Registration Invoice</a>
+            </div>
+            {% else %}
+            <!-- Investor View -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="{% url 'project_review:startup_idea_detail' notification.registration.pk %}?return=notifications"
+                class="notif-action-btn view-btn"
+                style="text-decoration: none; border: 1px solid var(--btn-color, #f50e06); color: var(--btn-color, #f50e06); background: transparent;">
+                View Idea
+              </a>
+
+              {% if not notification.is_read %}
+              <form action="{% url 'project_review:notification_confirm' notification.id %}" method="post"
+                style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="notif-action-btn primary">Confirm</button>
+              </form>
+              <form action="{% url 'project_review:notification_decline' notification.id %}" method="post"
+                style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="notif-action-btn secondary">Decline</button>
+              </form>
+              {% endif %}
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 40px 0; color: var(--sub-text, #64748b); background: var(--card-bg, white); border-radius: 4px;">
+          <p>No new notifications at this time.</p>
+        </div>
+        {% endfor %}
+
+        {% if notifications %}
+        <div class="load-more-wrap">
+          <button class="load-more-btn">Load more</button>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right Column: Timeline Labels -->
+      <div class="notif-timeline-col">
+        {% for notification in notifications %}
+        <!-- Simple logic: show date point for the first or if date changes -->
+        <div class="notif-time-point">
+          {{ notification.timestamp|date:"F d, Y" }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        © MyWorld
+      </div>
+      <div class="footer-right">
+        <span>Contact: +91 0123456789</span>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    function decrementBadge() {
+      const pageBadge = document.querySelector('.notif-badge-alt');
+      const navBadge = document.querySelector('.icon-btn--bell .badge-count');
+
+      [pageBadge, navBadge].forEach(badge => {
+        if (badge) {
+          let count = parseInt(badge.textContent);
+          if (count > 1) {
+            badge.textContent = count - 1;
+          } else {
+            badge.remove();
+            // Also remove 'has-new' class if it was the last one
+            document.querySelector('.icon-btn--bell')?.classList.remove('has-new');
+          }
+        }
+      });
+    }
+
+    document.querySelector('.notif-list-col').addEventListener('submit', (e) => {
+      if (e.target.tagName === 'FORM') {
+        const card = e.target.closest('.notif-card-alt');
+        if (card) {
+          const dot = card.querySelector('.notif-status-dot');
+          if (dot) dot.style.opacity = '0';
+        }
+        decrementBadge();
+      }
+    });
+
+    // Also handle direct clicks on cards for marking as read
+    document.querySelectorAll('.notif-card-alt').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // If it's a form button, don't trigger this (it redirects anyway)
+        if (e.target.tagName === 'BUTTON' || e.target.closest('form')) return;
+
+        const dot = card.querySelector('.notif-status-dot');
+        if (dot) {
+          const msgId = card.dataset.id;
+
+          // AJAX mark as read in database
+          fetch(`/notification/${msgId}/read/`, {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            }
+          });
+          // Visually update immediately
+          dot.style.opacity = '0';
+          decrementBadge();
+        }
+      });
+    });
+
+    function handleNotifClick(event, element) {
+      if (!event.target.closest('.notif-action-links')) {
+        const url = element.getAttribute('data-url');
+        if (url && url !== '#') {
+          window.location.href = url;
+        }
+      }
+    }
+  </script>
+  <script src="{% static 'project_review/js/live_updates.js' %}"></script>
+</body>
+</html>
+

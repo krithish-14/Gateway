@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Access | Portal</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --primary: var(--btn-color, #f50e06);
+      --primary-glow: rgba(245, 14, 6, 0.1);
+      --bg-white: var(--bg-color, #ffffff);
+      --surface: var(--card-bg, #ffffff);
+      --border: var(--card-border, #e2e8f0);
+      --text-main: var(--text-color, #0f172a);
+      --text-dim: var(--sub-text, #64748b);
+    }
+
+    [data-theme='dark'] .portal-logo-wrap {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    [data-theme='dark'] .portal-card {
+      background: rgba(255, 255, 255, 0.03) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    [data-theme='dark'] footer {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-white);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: var(--navbar-bg, #000);
+      padding: 1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      transform: translateX(-4px);
+    }
+
+    .navbar .logo img {
+      height: 40px;
+    }
+
+    .portal-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      background: var(--bg-color, #f8fafc);
+    }
+
+    .portal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 440px;
+      padding: 3.5rem 3rem;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+      text-align: center;
+      animation: cardFade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .portal-logo-wrap {
+      width: 72px;
+      height: 72px;
+      background: var(--bg-color, #f1f5f9);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+    }
+
+    .portal-logo-wrap img {
+      width: 40px;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+      color: var(--text-color, #000);
+    }
+
+    .description {
+      color: var(--text-dim);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 0.6rem;
+      margin-left: 0.5rem;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      width: 20px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1.1rem 1.25rem 1.1rem 3.25rem;
+      background: var(--input-bg, #ffffff);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-color, #000);
+      font-size: 1rem;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .error-msg {
+      background: var(--card-bg, #fff1f0);
+      border: 1px solid #ffa39e;
+      color: #f5222d;
+      padding: 1rem;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 1.1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 25px rgba(245, 14, 6, 0.2);
+    }
+
+    .btn-submit:hover {
+      background: #d40c05;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(245, 14, 6, 0.3);
+    }
+
+    .footer-action a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .footer-action a:hover {
+      color: var(--primary);
+    }
+
+    footer {
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="{% url 'project_review:home' %}" 
+       style="color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 4px;">&lt; Back</a>
+    <div class="logo">
+      <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
+    </div>
+  </nav>
+
+  <div class="portal-container">
+    <div class="portal-card">
+      <div class="portal-logo-wrap">
+        <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
+      </div>
+      <h1>Secure Portal</h1>
+      <p class="description">Enter your credentials to access the personal project verification dashboard.</p>
+
+      {% if error_message %}
+      <div class="error-msg">
+        <i data-lucide="alert-circle"></i>
+        <span>{{ error_message }}</span>
+      </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Registration Number</label>
+          <div class="input-wrap">
+            <i data-lucide="hash"></i>
+            <input type="text" name="registration_number" placeholder="e.g. 12345" required
+              value="{{ values.registration_number }}" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Security PIN</label>
+          <div class="input-wrap">
+            <i data-lucide="key-round"></i>
+            <input type="password" name="pin" placeholder="Enter your secret PIN" required
+              autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>Access Portal</span>
+          <i data-lucide="chevron-right"></i>
+        </button>
+      </form>
+
+      <div class="footer-action">
+        <a href="{% url 'project_review:home' %}">Return to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Constructor • Secure Verification Portal
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>

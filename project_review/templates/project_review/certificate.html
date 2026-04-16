@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Integrity - {{ reg_obj.startup_name|default:reg_obj.company_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c5a059;
+            --dark-blue: #0f172a;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .certificate-container {
+            width: 1000px;
+            height: 700px;
+            background: #fff;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 20px solid var(--dark-blue);
+            overflow: hidden;
+        }
+
+        /* Decorative Corners */
+        .certificate-container::before,
+        .certificate-container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 2px solid var(--gold);
+            z-index: 1;
+        }
+
+        .certificate-container::before {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .certificate-container::after {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .inner-border {
+            border: 2px solid var(--gold);
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            color: var(--dark-blue);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            font-weight: 600;
+            margin-bottom: 40px;
+        }
+
+        .award-to {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .recipient-name {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--dark-blue);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            display: inline-block;
+            min-width: 400px;
+        }
+
+        .certificate-text {
+            font-size: 1.1rem;
+            color: var(--text);
+            line-height: 1.8;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+
+        .certificate-text b {
+            color: var(--dark-blue);
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: auto;
+            padding: 0 40px;
+        }
+
+        .sig-box {
+            text-align: center;
+            width: 200px;
+        }
+
+        .sig-line {
+            border-top: 1px solid var(--text);
+            padding-top: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark-blue);
+        }
+
+        .sig-title {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Verified Stamp - Reference Image Style (SVG) */
+        .verified-stamp {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            width: 220px;
+            height: 220px;
+            transform: rotate(-15deg);
+            opacity: 0.9;
+            user-select: none;
+            pointer-events: none;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.15));
+        }
+
+        .verified-stamp svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .stamp-circle {
+            fill: none;
+            stroke: #1e3a8a; /* Deep Navy Blue */
+            stroke-width: 4;
+        }
+
+        .stamp-circle-inner {
+            fill: none;
+            stroke: #1e3a8a;
+            stroke-width: 2;
+        }
+
+        .stamp-text {
+            fill: #1e3a8a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 26px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .stamp-center-text {
+            fill: #1e3a8a;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .stamp-star {
+            fill: #1e3a8a;
+        }
+
+        /* Grunge Texture Overlay on the stamp */
+        .stamp-texture {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/p6-dark.png");
+            background-blend-mode: multiply;
+            border-radius: 50%;
+            mix-blend-mode: color-burn;
+        }
+
+        .cert-id {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none; }
+            .certificate-container { border: 20px solid var(--dark-blue) !important; box-shadow: none; }
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: var(--dark-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            background: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">Download Certificate</button>
+
+    <div class="certificate-container">
+        <div class="inner-border">
+            <img src="{% static 'project_review/images/logo.png' %}" alt="Gateway Logo" class="logo">
+            
+            <h1>Certificate</h1>
+            <div class="subtitle">Of Project Integrity</div>
+
+            <div class="award-to">This recognition is proudly presented to</div>
+            <div class="recipient-name">{{ reg_obj.startup_name|default:reg_obj.company_name|upper }}</div>
+
+            <p class="certificate-text">
+                For demonstrating exceptional professional standards and project authenticity. 
+                Achieving a <b>100% Integrity Score</b> through our proprietary neural verification engine, 
+                confirming complete originality and intellectual property compliance.
+                <br><br>
+                <i>"Innovation backed by integrity is the cornerstone of great ventures."</i>
+                <br>
+                <b>Approved by Gateway Pvt Ltd</b>
+            </p>
+
+            <div class="signature-section">
+                <div class="sig-box">
+                    <div class="sig-line">System Verified</div>
+                    <div class="sig-title">Neural Engine v4.2</div>
+                </div>
+                <div class="sig-box">
+                    <div class="sig-line">{{ cert_date|date:"F d, Y" }}</div>
+                    <div class="sig-title">Date of Authentication</div>
+                </div>
+                <div class="sig-box">
+                    <div class="sig-line">Gateway Executive</div>
+                    <div class="sig-title">Verification Board</div>
+                </div>
+            </div>
+
+            <div class="verified-stamp">
+                <div class="stamp-texture"></div>
+                <svg viewBox="0 0 200 200">
+                    <!-- Outer Circles -->
+                    <circle cx="100" cy="100" r="95" class="stamp-circle" />
+                    <circle cx="100" cy="100" r="85" class="stamp-circle-inner" />
+                    
+                    <!-- Path for Curved Text (Top inner) -->
+                    <path id="topCurve" d="M 40,105 A 60,60 0 0,1 160,105" fill="transparent" />
+                    
+                    <!-- Single Curved "VERIFIED" Label -->
+                    <text class="stamp-text">
+                        <textPath xlink:href="#topCurve" startOffset="50%" text-anchor="middle">VERIFIED</textPath>
+                    </text>
+                    
+                    <!-- Center Horizontal Label Precisely Aligned -->
+                    <g transform="translate(100, 100)">
+                        <line x1="-55" y1="-20" x2="55" y2="-20" stroke="#1e3a8a" stroke-width="2" />
+                        <text class="stamp-center-text" text-anchor="middle" dominant-baseline="central" y="0">GATEWAY</text>
+                        <line x1="-55" y1="20" x2="55" y2="20" stroke="#1e3a8a" stroke-width="2" />
+                    </g>
+
+                    <!-- Star Cluster for Bottom Half balance -->
+                    <g fill="#1e3a8a" font-size="16">
+                        <text x="75" y="165" text-anchor="middle">★</text>
+                        <text x="100" y="175" text-anchor="middle">★</text>
+                        <text x="125" y="165" text-anchor="middle">★</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+        <div class="cert-id">CERTIFICATE ID: #GW-{{ reg_obj.registration_number }}-{{ reg_obj.id }}</div>
+    </div>
+</body>
+</html>

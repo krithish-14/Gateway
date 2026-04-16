@@ -1,0 +1,14 @@
+Django>=5.0
+requests
+gunicorn
+mssql-django
+pyodbc
+pdfplumber
+pytesseract
+Pillow
+scikit-learn
+playwright
+python-dotenv
+django-background-tasks
+whitenoise
+django-cors-headers

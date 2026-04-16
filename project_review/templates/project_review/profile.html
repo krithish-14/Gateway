@@ -1,0 +1,981 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile Settings</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <!-- Cropper.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <style>
+    :root {
+      --primary-red: var(--btn-color, #f50e06);
+      --bg-light: var(--bg-color, #f9f9f9);
+      --border-color: var(--card-border, #ddd);
+      --text-main: var(--text-color, #333);
+      --text-muted: var(--sub-text, #666);
+    }
+
+    body {
+      background-color: var(--bg-light);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, oxygen, ubuntu, cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .content-area {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      border-bottom: 2px solid var(--primary-red);
+      padding-bottom: 10px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 32px;
+    }
+
+    .form-section {
+      background: var(--card-bg, white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--card-border, #eee);
+      padding-bottom: 12px;
+    }
+
+    .photo-management {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-pic-large {
+      width: 250px;
+      height: 250px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      background: #eee;
+      border: 1px solid var(--border-color);
+      display: block;
+    }
+
+    .btn-action-red {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary-red);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: auto;
+      min-width: 160px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(245, 14, 6, 0.3);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-action-red:hover {
+      background: #ff3b3b;
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(245, 14, 6, 0.5);
+    }
+
+    .btn-outline-red {
+      display: inline-block;
+      padding: 10px 20px;
+      border: 2px solid var(--primary-red);
+      border-radius: 30px;
+      background: transparent;
+      color: var(--primary-red);
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .btn-outline-red:hover {
+      background: var(--primary-red);
+      color: white;
+    }
+
+    /* Styled File Input Button */
+    input[type="file"]::file-selector-button {
+      background-color: transparent;
+      color: var(--primary-red);
+      border: 1px solid var(--primary-red);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background-color: var(--primary-red);
+      color: white;
+    }
+
+    /* Webkit fallback */
+    input[type="file"]::-webkit-file-upload-button {
+      background-color: transparent;
+      color: var(--primary-red);
+      border: 1px solid var(--primary-red);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+
+    input[type="file"]:hover::-webkit-file-upload-button {
+      background-color: var(--primary-red);
+      color: white;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 15px;
+      color: var(--text-main);
+      box-sizing: border-box;
+      background: var(--input-bg, #fff);
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-red);
+    }
+
+    .input-group input[readonly] {
+      background: var(--bg-light);
+      color: #777;
+      cursor: not-allowed;
+    }
+
+    .row-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-pic-large {
+        width: 100%;
+        max-width: 250px;
+      }
+    }
+
+    /* Circular Progress Chart Styles */
+    .completion-chart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+      margin-bottom: 10px;
+    }
+
+    .circular-progress {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: conic-gradient(var(--primary-red) calc(var(--percentage) * 1%), #f0f0f0 0);
+      position: relative;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .inner-circle {
+      width: 120px;
+      height: 120px;
+      background: var(--card-bg, white);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .percentage-text {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .percentage-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .progress-status {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .status-low {
+      color: #f50e06;
+      background: rgba(245, 14, 6, 0.1);
+    }
+
+    .status-mid {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .status-high {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Cropper Modal Styles */
+    .cropper-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .cropper-container-box {
+      background: var(--card-bg, white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .cropper-wrapper {
+      width: 100%;
+      max-height: 400px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+
+    .cropper-wrapper img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .cropper-controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .btn-crop-save {
+      background: var(--primary-red);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-crop-cancel {
+      background: #eee;
+      color: var(--text-color, #333);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Trust Score & Verification Styles */
+    .trust-score-card {
+      background: var(--card-bg, white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-top: 4px solid #10b981;
+      text-align: center;
+    }
+
+    .trust-score-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #10b981;
+      line-height: 1;
+      margin: 10px 0;
+    }
+
+    .verification-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .badge-verified {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    .badge-failed {
+      background: rgba(245, 14, 6, 0.1);
+      color: #f50e06;
+    }
+
+    .verification-status-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: block;
+      margin-top: 5px;
+    }
+
+    /* Premium UI Enhancements */
+    .form-section {
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .form-section:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme='dark'] .form-section:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      box-shadow: 0 0 0 3px rgba(245, 14, 6, 0.15);
+    }
+
+    .theme-card {
+      cursor: pointer;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      background: var(--card-bg);
+    }
+
+    .theme-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+      border-color: var(--primary-red);
+    }
+
+    [data-theme='dark'] .theme-card:hover {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme='dark'] .circular-progress {
+      background: conic-gradient(var(--primary-red) calc(var(--percentage) * 1%), #334155 0);
+    }
+  </style>
+  <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+  <script>
+    // Theme logic defined in head to ensure availability
+    // Theme logic defined in head to ensure availability
+    function setThemePreference(theme) {
+      console.log('[Profile] Requested theme transition to:', theme);
+      if (window.setPreference) {
+        window.setPreference(theme);
+        if (window.updateThemeCards) window.updateThemeCards(theme);
+      } else {
+        console.warn('[Profile] window.setPreference not found, applying user-specific storage key directly');
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return 'guest';
+        };
+        const storageKey = 'theme-preference-' + getCookie('theme_user_id');
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(storageKey, theme);
+        if (window.updateThemeCards) window.updateThemeCards(theme);
+      }
+    }
+
+    function updateThemeCards(theme) {
+      const lightCard = document.getElementById('theme-light-card');
+      const darkCard = document.getElementById('theme-dark-card');
+      if (!lightCard || !darkCard) return;
+
+      if (theme === 'dark') {
+        darkCard.style.borderColor = 'var(--primary-red)';
+        darkCard.style.boxShadow = '0 0 0 3px rgba(245,14,6,0.15)';
+        lightCard.style.borderColor = 'var(--card-border, #eee)';
+        lightCard.style.boxShadow = 'none';
+      } else {
+        lightCard.style.borderColor = 'var(--primary-red)';
+        lightCard.style.boxShadow = '0 0 0 3px rgba(245,14,6,0.15)';
+        darkCard.style.borderColor = 'var(--card-border, #eee)';
+        darkCard.style.boxShadow = 'none';
+      }
+    }
+    
+    // Globally expose functions
+    window.setThemePreference = setThemePreference;
+    window.updateThemeCards = updateThemeCards;
+  </script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+  <!-- Original Navbar -->
+  <nav class="navbar">
+    <a href="{{ back_url|default:back_default }}"
+      style="color: var(--btn-color, red); text-decoration: none; margin-left:8px; font-weight: bold;">&lt; Back</a>
+    <div class="logo"><img src="{% static 'project_review/images/logo.png' %}" alt="Logo"></div>
+    <div class="nav-icons"></div> <!-- Added for theme toggle injection -->
+  </nav>
+
+  <!-- Main Content Area with Dashboard Form -->
+  <div class="content-area">
+    <div class="page-header">
+      <h1 class="page-title">My Profile Settings</h1>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-weight: bold;">User: {{ user.username }}</span>
+        <button type="submit" form="logout-form" class="btn-action-red"
+          style="padding: 8px 16px; min-width: 100px; font-size: 12px; background: transparent; border: 1px solid #f50e06; color: #f50e06; box-shadow: none;">Logout</button>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="profile-form">
+      {% csrf_token %}
+      <div class="profile-grid">
+
+        <!-- Column 1: Photo and Account -->
+        <div class="left-col">
+          <!-- Profile Completion Chart Section -->
+          <div class="form-section" style="text-align: center; border-top: 4px solid var(--primary-red);">
+            <h2 class="section-title" style="border-bottom: none; margin-bottom: 10px;">Profile Strength</h2>
+            <div class="completion-chart-container">
+              <div class="circular-progress" style="--percentage: {{ profile.completion_percentage }}">
+                <div class="inner-circle">
+                  <span class="percentage-text">{{ profile.completion_percentage }}%</span>
+                  <span class="percentage-label">Complete</span>
+                </div>
+              </div>
+            </div>
+
+            {% with p=profile.completion_percentage %}
+            {% if p < 40 %} <span class="progress-status status-low">Needs Attention</span> {% elif p < 80 %} <span
+                class="progress-status status-mid">Getting There</span>
+                {% else %}
+                <span class="progress-status status-high">Strong Profile</span>
+                {% endif %}
+                {% endwith %}
+
+                {% if profile.role == 'investor' and not user.companies.first.gst_invoice %}
+                <div
+                  style="background: rgba(245, 14, 6, 0.05); border-left: 3px solid var(--primary-red); padding: 10px; margin-top: 15px; text-align: left;">
+                  <p style="color: var(--primary-red); font-size: 13px; font-weight: 700; margin: 0;">⚠️ GST Invoice
+                    Mandatory</p>
+                  <p style="color: var(--text-muted); font-size: 11px; margin: 4px 0 0 0;">You cannot reach 100% or
+                    become a verified investor without uploading your GST invoice.</p>
+                </div>
+                {% endif %}
+
+                {% if profile.role == 'investor' %}
+                <div class="completion-breakdown"
+                  style="margin-top: 25px; text-align: left; background: var(--card-bg, #fff); border-radius: 12px; padding: 15px; border: 1px solid var(--card-border, #eee);">
+                  <h3
+                    style="font-size: 14px; color: var(--text-main); margin-bottom: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Strength Breakdown</h3>
+
+                  {% with b=profile.investor_completion_breakdown %}
+                  <div class="breakdown-item" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                      <span style="font-weight: 600; color: var(--text-muted);">Personal Info</span>
+                      <span style="font-weight: 700; color: var(--primary-red);">{{ b.personal }}/20%</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                      <div
+                        style="width: {% widthratio b.personal 20 100 %}%; height: 100%; background: var(--primary-red); border-radius: 10px;">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="breakdown-item" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                      <span style="font-weight: 600; color: var(--text-muted);">Professional Links</span>
+                      <span style="font-weight: 700; color: var(--primary-red);">{{ b.professional }}/40%</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                      <div
+                        style="width: {% widthratio b.professional 40 100 %}%; height: 100%; background: var(--primary-red); border-radius: 10px;">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="breakdown-item" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                      <span style="font-weight: 600; color: var(--text-muted);">About & Experience</span>
+                      <span style="font-weight: 700; color: var(--primary-red);">{{ b.about }}/30%</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                      <div
+                        style="width: {% widthratio b.about 30 100 %}%; height: 100%; background: var(--primary-red); border-radius: 10px;">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="breakdown-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                      <span style="font-weight: 600; color: var(--text-muted);">Photo Management</span>
+                      <span style="font-weight: 700; color: var(--primary-red);">{{ b.photo }}/10%</span>
+                    </div>
+                    <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                      <div
+                        style="width: {% widthratio b.photo 10 100 %}%; height: 100%; background: var(--primary-red); border-radius: 10px;">
+                      </div>
+                    </div>
+                  </div>
+                  {% endwith %}
+                </div>
+                {% endif %}
+
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: 20px; line-height: 1.4;">
+                  {% if profile.role == 'investor' %}
+                  Complete these sections to become a verified strategic partner.
+                  {% else %}
+                  Fill in your startup details and professional links to attract more investors.
+                  {% endif %}
+                </p>
+          </div>
+
+
+
+          <div class="form-section">
+            <h2 class="section-title">Photo Management</h2>
+            <div class="photo-management">
+              {% if profile and profile.profile_image %}
+              <img src="{{ profile.profile_image.url }}" class="profile-pic-large" alt="Profile Photo">
+              {% else %}
+              <img src="{% static 'project_review/images/logo.png' %}" class="profile-pic-large" alt="Profile Photo"
+                style="padding: 40px; opacity: 0.3;">
+              {% endif %}
+
+              <div class="input-group" style="text-align: center; width: 100%;">
+                <label style="text-align: center; margin-bottom: 12px;">Choose User Photo</label>
+                <div style="margin-bottom: 20px;">
+                  <input type="file" id="profile-image-input" name="profile_image" accept="image/*"
+                    style="border: none; padding: 0; font-size: 13px; cursor: pointer; display: inline-block; width: auto;">
+                </div>
+                <!-- Hidden input for base64 cropped data -->
+                <input type="hidden" name="cropped_image_data" id="cropped-image-data">
+                <button type="submit" class="btn-action-red" style="width: 100%;">Save Photo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Detailed Info -->
+        <div class="right-col">
+          <!-- Display Theme Selection Section -->
+          <div class="form-section">
+            <h2 class="section-title">Display Preferences</h2>
+            <div class="theme-selector" style="display: flex; gap: 20px;">
+              <div class="theme-card" id="theme-light-card" onclick="window.setThemePreference('light')">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <div style="font-weight: 700; font-size: 15px; color: var(--text-color);">Light Mode</div>
+              </div>
+              <div class="theme-card" id="theme-dark-card" onclick="window.setThemePreference('dark')">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <div style="font-weight: 700; font-size: 15px; color: var(--text-color);">Dark Mode</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2 class="section-title">Personal Information</h2>
+            <div class="row-grid">
+              <div class="input-group">
+                <label>Username</label>
+                <input type="text" value="{{ user.username }}" readonly>
+              </div>
+              <div class="input-group">
+                <label>First Name</label>
+                <input type="text" name="first_name" value="{{ form.initial.first_name }}">
+              </div>
+            </div>
+            <div class="row-grid">
+              <div class="input-group">
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="{{ form.initial.last_name }}">
+              </div>
+              <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" value="{{ form.initial.email }}">
+              </div>
+            </div>
+            <div class="row-grid">
+              <div class="input-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" value="{{ form.initial.phone_number }}">
+              </div>
+              <div class="input-group">
+                <label>Location</label>
+                <input type="text" name="location" value="{{ form.initial.location }}">
+              </div>
+            </div>
+
+            {% if profile.role == 'investor' %}
+            <div class="row-grid">
+              <div class="input-group">
+                <label>Company Name</label>
+                <input type="text" name="company_name" value="{{ form.initial.company_name }}">
+              </div>
+              <div class="input-group">
+                <label>Role in Company</label>
+                <input type="text" name="investor_role_in_company" value="{{ form.initial.investor_role_in_company }}">
+              </div>
+            </div>
+            {% elif profile.role == 'startup' %}
+            <div class="input-group">
+              <label>Current Address</label>
+              <textarea name="current_address" style="height: 100px;">{{ form.initial.current_address }}</textarea>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-section">
+            <h2 class="section-title">Professional Links</h2>
+            <div class="row-grid">
+              {% if profile.role == 'investor' %}
+              {% with company=user.companies.first %}
+              <div class="input-group">
+                <label>Company Website</label>
+                <input type="url" name="company_website" value="{{ form.initial.company_website }}">
+                {% if company.website_verified %}
+                <span class="verification-badge badge-verified">✓ Website Verified</span>
+                {% elif company.website_status != 'Not Provided' %}
+                <span class="verification-badge badge-pending">Verification: {{ company.website_status }}</span>
+                {% endif %}
+              </div>
+              <div class="input-group">
+                <label>LinkedIn Profile</label>
+                <input type="url" name="linkedin_profile" value="{{ form.initial.linkedin_profile }}">
+                {% if company.linkedin_verified %}
+                <span class="verification-badge badge-verified">✓ LinkedIn Verified</span>
+                {% elif company.linkedin_profile %}
+                <span class="verification-badge badge-pending">Pending Verification</span>
+                {% endif %}
+              </div>
+              {% endwith %}
+              {% elif profile.role == 'startup' %}
+              <div class="input-group">
+                <label>Portfolio</label>
+                <input type="url" name="startup_website" value="{{ form.initial.startup_website }}">
+              </div>
+              <div class="input-group">
+                <label>GitHub Profile</label>
+                <input type="url" name="github_profile" value="{{ form.initial.github_profile }}">
+              </div>
+              {% endif %}
+            </div>
+
+            {% if profile.role == 'startup' %}
+            <div class="row-grid" style="margin-top: 20px;">
+              <div class="input-group">
+                <label>LinkedIn Profile</label>
+                {% if profile.role == 'startup' and form.initial.linkedin_profile %}
+                <input type="url" name="linkedin_profile" value="{{ form.initial.linkedin_profile }}" readonly>
+                {% else %}
+                <input type="url" name="linkedin_profile" value="{{ form.initial.linkedin_profile }}">
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+            {% if profile.role == 'investor' %}
+            {% with company=user.companies.first %}
+            <div class="row-grid" style="margin-top: 20px;">
+              <div class="input-group">
+                <label>GST Invoice (PDF or Scan)</label>
+                <input type="file" name="gst_invoice" accept=".pdf,image/*">
+                {% if company.gst_verified %}
+                <span class="verification-badge badge-verified">✓ GST Verified ({{ company.gstin_number }})</span>
+                {% elif company.gst_invoice %}
+                <span class="verification-badge badge-pending">OCR Status: {{ company.gst_verification_status }}</span>
+                {% endif %}
+                {% if company.gst_invoice %}
+                <div style="margin-top: 10px;">
+                  <a href="{{ company.gst_invoice.url }}" target="_blank"
+                    style="color: var(--primary-red); font-weight: bold; text-decoration: none; font-size: 14px;">View
+                    Current Invoice &rarr;</a>
+                </div>
+                {% endif %}
+              </div>
+              {% endwith %}
+              <div class="input-group">
+                <label>Company Logo</label>
+                <input type="file" name="company_logo" accept="image/*">
+                {% if user.companies.first.logo %}
+                <div style="margin-top: 10px;">
+                  <a href="{{ user.companies.first.logo.url }}" target="_blank"
+                    style="color: var(--primary-red); font-weight: bold; text-decoration: none; font-size: 14px;">View
+                    Current Logo &rarr;</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if profile.role == 'investor' %}
+          <div class="form-section">
+            <h2 class="section-title">About & Experience</h2>
+            <div class="input-group" style="margin-top: 20px;">
+              <label>About Company / Biographical Info</label>
+              <textarea name="about_company" style="height: 120px;">{{ form.initial.about_company }}</textarea>
+            </div>
+            <div class="input-group">
+              <label>Investment Focus</label>
+              <textarea name="investment_focus" style="height: 120px;">{{ form.initial.investment_focus }}</textarea>
+            </div>
+          </div>
+          {% endif %}
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px; margin-bottom: 40px;">
+            <button type="submit" class="btn-action-red" style="padding: 15px 40px; font-size: 16px;">Save All
+              Changes</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Original Footer -->
+  <footer>
+    <p>© My Profile</p>
+  </footer>
+
+  <form id="logout-form" action="{% url 'project_review:logout' %}" method="post" style="display:none;">
+    {% csrf_token %}
+  </form>
+
+  <!-- Cropper Modal -->
+  <div class="cropper-modal-overlay" id="cropper-modal">
+    <div class="cropper-container-box">
+      <h3 style="margin-top: 0; margin-bottom: 15px;">Adjust Your Photo</h3>
+      <div class="cropper-wrapper">
+        <img id="cropper-image" src="" alt="To Crop">
+      </div>
+      <div class="cropper-controls">
+        <button type="button" class="btn-crop-cancel" id="cancel-crop">Cancel</button>
+        <button type="button" class="btn-crop-save" id="apply-crop">Apply Crop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cropper.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Photo Cropping Logic
+      const imageInput = document.getElementById('profile-image-input');
+      const cropperModal = document.getElementById('cropper-modal');
+      const cropperImage = document.getElementById('cropper-image');
+      const applyCropBtn = document.getElementById('apply-crop');
+      const cancelCropBtn = document.getElementById('cancel-crop');
+      const croppedImageData = document.getElementById('cropped-image-data');
+      let cropper;
+
+      imageInput.addEventListener('change', function (e) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            cropperImage.src = e.target.result;
+            cropperModal.style.display = 'flex';
+            if (cropper) {
+              cropper.destroy();
+            }
+            cropper = new Cropper(cropperImage, {
+              aspectRatio: 1,
+              viewMode: 2,
+            });
+          };
+          reader.readAsDataURL(files[0]);
+        }
+      });
+
+      applyCropBtn.addEventListener('click', function () {
+        if (!cropper) return;
+        const canvas = cropper.getCroppedCanvas({
+          width: 500,
+          height: 500,
+        });
+        croppedImageData.value = canvas.toDataURL('image/jpeg');
+        cropperModal.style.display = 'none';
+        
+        // Show preview in the page
+        const preview = document.querySelector('.profile-pic-large');
+        if (preview) {
+            preview.src = canvas.toDataURL('image/jpeg');
+        }
+      });
+
+      cancelCropBtn.addEventListener('click', function () {
+        cropperModal.style.display = 'none';
+        imageInput.value = '';
+      });
+
+      // Close modal on background click
+      cropperModal.addEventListener('click', function (e) {
+        if (e.target === cropperModal) {
+          cropperModal.style.display = 'none';
+          imageInput.value = '';
+        }
+      });
+    });
+
+    // Initialize theme selection cards on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
+      window.updateThemeCards(theme);
+    });
+
+    // Listen for changes
+    window.addEventListener('storage', () => {
+      const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
+       window.updateThemeCards(theme);
+    });
+    
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#theme-toggle');
+      if(btn) {
+        setTimeout(()=>{
+          const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
+           window.updateThemeCards(theme);
+        }, 150);
+      }
+    });
+  </script>
+  <script src="{% static 'project_review/js/live_updates.js' %}"></script>
+</body>
+</html>
+

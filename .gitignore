@@ -1,0 +1,53 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# === Django ===
+*.log
+*.pot
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+debug.log
+
+# === Virtual Environments ===
+.venv/
+venv/
+env/
+myworld/
+ENV/
+
+# === Secrets / ENV ===
+.env
+*.env
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+*.pid
+
+# === Test / Coverage ===
+.coverage
+htmlcov/
+.pytest_cache/
+
+# === Node (if any frontend) ===
+node_modules/

@@ -1,0 +1,660 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body>
+  <style>
+    :root {
+      --primary-red: var(--btn-color, #f50e06);
+      --sidebar-bg: var(--navbar-bg, #0f172a);
+      --accent-purple: #6c3bcf;
+      --bg-light: var(--bg-color, #f8fafc);
+      --text-main: var(--text-color, #1e293b);
+      --text-muted: var(--sub-text, #64748b);
+      --border-color: var(--card-border, #e2e8f0);
+      --glass-bg: var(--card-bg, rgba(255, 255, 255, 0.85));
+    }
+
+    body {
+      background: var(--bg-light);
+      font-family: 'Outfit', 'Inter', sans-serif;
+      margin: 0;
+      overflow: hidden;
+      color: var(--text-main);
+    }
+
+    .messages-layout {
+      display: flex;
+      height: calc(100vh - 70px);
+      background: var(--card-bg, white);
+      margin: 15px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Modified Sidebar */
+    .chat-sidebar {
+      width: 380px;
+      background: var(--sidebar-bg);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative !important;
+      transform: none !important;
+      height: 100% !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      z-index: 10;
+    }
+
+    .chat-sidebar__header {
+      padding: 30px 24px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent);
+    }
+
+    .chat-sidebar__title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-sidebar__title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-sidebar__search {
+      position: relative;
+    }
+
+    .chat-sidebar__search input {
+      width: 100%;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 0 50px 0 20px;
+      color: white;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-sizing: border-box;
+    }
+
+    .chat-sidebar__search input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--primary-red);
+      box-shadow: 0 0 0 4px rgba(245, 14, 6, 0.15);
+    }
+
+    .chat-sidebar__search button {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      font-weight: 700;
+      padding: 8px;
+    }
+
+    .chat-sidebar__list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .chat-sidebar__list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-sidebar__list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .item {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      padding: 18px 20px;
+      border-radius: 18px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .item.active {
+      background: rgba(245, 14, 6, 0.1);
+      border-left: 4px solid var(--primary-red);
+    }
+
+    .avatar-wrap {
+      position: relative;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background: #22c55e;
+      border: 3px solid var(--sidebar-bg);
+      border-radius: 50%;
+    }
+
+    .meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meta .name {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meta .snippet {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .time {
+      font-size: 11px;
+      color: var(--footer-text, rgba(255, 255, 255, 0.4));
+      font-weight: 600;
+    }
+
+    .sidebar-badge {
+      background: var(--primary-red);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* Detail / Chat Area */
+    .detail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-color, #fdfdfd);
+      position: relative;
+    }
+
+    .chat-header {
+      padding: 24px 35px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      height: 90px;
+      box-sizing: border-box;
+    }
+
+    .chat-header__info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .chat-header__name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .chat-header__status {
+      font-size: 12px;
+      color: #22c55e;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chat-header__status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    .thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 35px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .message-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .bubble {
+      max-width: 65%;
+      padding: 16px 22px;
+      font-size: 15px;
+      line-height: 1.6;
+      border-radius: 22px;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s;
+    }
+
+    .bubble.me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent-purple), #8b5cf6);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.partner {
+      align-self: flex-start;
+      background: var(--input-bg, white);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble .msg-time {
+      font-size: 10px;
+      margin-top: 8px;
+      display: block;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    .composer-wrap {
+      padding: 20px 35px 35px;
+      background: var(--card-bg, white);
+    }
+
+    .composer {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: var(--bg-light);
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s;
+    }
+
+    .composer:focus-within {
+      background: var(--card-bg, white);
+      border-color: var(--accent-purple);
+      box-shadow: 0 10px 30px rgba(108, 59, 207, 0.1);
+    }
+
+    .composer input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 15px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+
+    .composer input:focus {
+      outline: none;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-purple);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(108, 59, 207, 0.3);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      background: #7c3aed;
+      box-shadow: 0 12px 25px rgba(108, 59, 207, 0.4);
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-state img {
+      width: 200px;
+      margin-bottom: 30px;
+      filter: grayscale(1) opacity(0.3);
+    }
+
+    .empty-state h2 {
+      font-size: 24px;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <nav class="navbar" style="justify-content: space-between !important;">
+    <a href="{% url 'project_review:home' %}"
+      style="color:var(--primary-red); text-decoration:none; font-weight:800; font-size:16px;">&lt; Back</a>
+    <div class="logo"><img src="{% static 'project_review/images/logo.png' %}" alt="Logo" style="height:45px;"></div>
+  </nav>
+
+  <div class="messages-layout">
+    <!-- Sidebar -->
+    <aside class="chat-sidebar" id="chat-sidebar">
+      <div class="chat-sidebar__header">
+        <div class="chat-sidebar__title">Gateway Chat</div>
+        <div class="chat-sidebar__search">
+          <input type="text" id="searchInput" placeholder="Search conversations..." />
+          <button id="searchBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-sidebar__list" id="messageList">
+        {% if messages_list %}
+        {% for m in messages_list %}
+        <div class="item" data-user-id="{{ m.user_id }}" data-name="{{ m.sender }}">
+          <div class="avatar-wrap">
+            <div class="avatar">{{ m.sender|slice:":1" }}</div>
+            <div class="status-dot"></div>
+          </div>
+          <div class="meta">
+            <div class="name">
+              <span>{{ m.sender }}</span>
+              <span class="time">{{ m.time }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="snippet" id="snippet-{{ m.user_id }}">{{ m.text }}</div>
+              {% if m.unread %}
+              <span class="sidebar-badge" id="badge-{{ m.user_id }}">{{ m.unread_count }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div style="padding:24px; opacity:.6; text-align:center; font-size:14px;">
+          No conversations yet. Connect with strategic partners to begin.
+        </div>
+        {% endif %}
+      </div>
+    </aside>
+
+    <!-- Detail area -->
+    <section class="detail" id="detail">
+      <div class="chat-header" id="chatHeader" style="display:none;">
+        <div class="chat-header__info">
+          <div class="avatar" id="headerAvatar" style="width:40px; height:40px; font-size:14px; border-radius:12px;">
+          </div>
+          <div>
+            <h3 class="chat-header__name" id="activeChatName"></h3>
+            <div class="chat-header__status">Online</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 15px;">
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+              </path>
+            </svg>
+          </button>
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <img src="{% static 'project_review/images/message.png' %}" alt="Messages">
+        <h2>Corporate Messenger</h2>
+        <p>Select a partner profile from the sidebar to view your secure end-to-end encrypted conversation thread.</p>
+      </div>
+
+      <div class="thread" id="thread" style="display:none;">
+        <!-- Filled by AJAX -->
+      </div>
+
+      <div class="composer-wrap" id="composer" style="display:none">
+        <div class="composer">
+          <input type="text" id="messageInput" placeholder="Write your professional response..." autocomplete="off" />
+          <button class="send-btn" id="sendBtn" title="Send (Enter)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let activeUserId = null;
+    const thread = document.getElementById('thread');
+    const empty = document.getElementById('emptyState');
+    const composer = document.getElementById('composer');
+    const chatHeader = document.getElementById('chatHeader');
+    const activeChatName = document.getElementById('activeChatName');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messageList = document.getElementById('messageList');
+
+    function scrollToBottom() {
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    async function loadChat(userId, name) {
+      activeUserId = userId;
+      activeChatName.textContent = name;
+      headerAvatar.textContent = name.charAt(0);
+      empty.style.display = 'none';
+      thread.style.display = 'flex';
+      composer.style.display = 'block';
+      chatHeader.style.display = 'flex';
+
+      // Mark badge as read on UI
+      const badge = document.getElementById(`badge-${userId}`);
+      if (badge) badge.remove();
+
+      try {
+        const response = await fetch(`/api/messages/chat/${userId}/`);
+        const data = await response.json();
+
+        if (data.success) {
+          thread.innerHTML = data.messages.map(m => `
+                    <div class="bubble ${m.is_me ? 'me' : 'partner'}">
+                        <div class="content">${m.body}</div>
+                        <span class="msg-time">${m.timestamp.includes(' ') ? m.timestamp.split(' ')[1].substring(0, 5) : 'Just now'}</span>
+                    </div>
+                `).join('');
+          scrollToBottom();
+        }
+      } catch (error) {
+        console.error('Error loading chat:', error);
+      }
+    }
+
+    if (messageList) {
+      messageList.addEventListener('click', (e) => {
+        const item = e.target.closest('.item');
+        if (!item) return;
+
+        // UI highlight
+        document.querySelectorAll('.item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        loadChat(item.dataset.userId, item.dataset.name);
+      });
+    }
+
+    async function sendMessage() {
+      const body = messageInput.value.trim();
+      if (!body || !activeUserId) return;
+
+      messageInput.value = '';
+
+      try {
+        const response = await fetch('/api/messages/send/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({
+            recipient_id: activeUserId,
+            body: body
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          const msgDiv = document.createElement('div');
+          msgDiv.className = 'bubble me';
+          msgDiv.innerHTML = `
+                    <div class="content">${data.message.body}</div>
+                    <span class="msg-time">Just now</span>
+                `;
+          thread.appendChild(msgDiv);
+          scrollToBottom();
+
+          // Update snippet in sidebar
+          const snippet = document.getElementById(`snippet-${activeUserId}`);
+          if (snippet) snippet.textContent = body;
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Enhanced Handing of initial user (priority selection)
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialUserId = urlParams.get('user_id') || urlParams.get('user');
+
+    if (initialUserId) {
+      // Try selecting immediately
+      const selectInitialBtn = () => {
+        const item = document.querySelector(`.item[data-user-id="${initialUserId}"]`);
+        if (item) {
+          item.click();
+          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return true;
+        }
+        return false;
+      };
+
+      if (!selectInitialBtn()) {
+        // Fallback for slower renders
+        let attempts = 0;
+        const interval = setInterval(() => {
+          attempts++;
+          if (selectInitialBtn() || attempts > 10) clearInterval(interval);
+        }, 100);
+      }
+    }
+  </script>
+
+  <script src="{% static 'project_review/js/live_updates.js' %}"></script>
+</body>
+</html>
+

@@ -1,0 +1,452 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strategic Partners | Gateway Ecosystem</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary-red: var(--btn-color, #f12711);
+      --accent-red: #f5af19;
+      --hover-red: #d41414;
+      --bg-dark: var(--navbar-bg, #000000);
+      --sidebar-width: 320px;
+    }
+
+    body {
+      background-color: var(--bg-color, #f8fafc);
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.95) !important;
+      padding: 10px 40px !important;
+      height: 70px;
+      border-bottom: 2px solid var(--primary-red);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-section {
+      background: var(--bg-dark);
+      padding: 80px 20px 100px;
+      text-align: center;
+      color: white;
+      border-bottom: 2px solid var(--primary-red);
+      background-image: 
+        radial-gradient(circle at top right, rgba(241, 39, 17, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at bottom left, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%);
+      animation: drift 20s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes drift {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-section h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 24px;
+      letter-spacing: -0.03em;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .domain-search-container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .search-panel {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-panel:focus-within {
+      transform: scale(1.02);
+      border-color: var(--primary-red);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 5px rgba(241, 39, 17, 0.1);
+    }
+
+    .domain-input {
+      flex: 1;
+      background: transparent !important;
+      border: none !important;
+      color: white !important;
+      font-size: 1.25rem !important;
+      padding: 12px 30px !important;
+      outline: none !important;
+      margin: 0 !important;
+      font-weight: 500;
+    }
+
+    .search-trigger {
+      background: linear-gradient(135deg, var(--primary-red), #ff512f);
+      color: white;
+      border: none;
+      padding: 12px 45px;
+      border-radius: 100px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      box-shadow: 0 8px 15px rgba(241, 39, 17, 0.4);
+    }
+
+    .search-trigger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(241, 39, 17, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .main-grid {
+      max-width: 1300px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      gap: 40px;
+      padding: 0 20px;
+    }
+
+    .sidebar-sticky {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+
+    .filter-card {
+      background: var(--card-bg, white);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--card-border);
+      transition: transform 0.3s;
+    }
+
+    [data-theme='dark'] .filter-card {
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .filter-group h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--primary-red);
+      margin-bottom: 20px;
+      letter-spacing: 0.15em;
+      font-weight: 800;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .cat-item:hover {
+      background: var(--bg-color, #f8fafc);
+      transform: translateX(5px);
+    }
+
+    .cat-item.active {
+      background: rgba(245, 14, 6, 0.1);
+      color: var(--primary-red);
+      border-color: rgba(245, 14, 6, 0.2);
+    }
+
+    .cat-item input {
+      width: 18px !important;
+      height: 18px !important;
+      margin: 0 !important;
+      accent-color: var(--primary-red);
+    }
+
+    .rating-slider {
+      width: 100%;
+      height: 6px;
+      background: var(--card-border, #e2e8f0);
+      border-radius: 10px;
+      appearance: none;
+      outline: none;
+      accent-color: var(--primary-red);
+    }
+
+    .results-panel h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .investor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 25px;
+      justify-content: center;
+    }
+
+    /* Override company card from _company_list.html */
+    .company-card {
+      background: var(--card-bg) !important;
+      border: 1px solid var(--card-border, #f1f5f9) !important;
+      border-radius: 24px !important;
+      padding: 25px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    [data-theme='dark'] .company-card {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .company-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+      border-color: var(--primary-red) !important;
+    }
+
+    .company-card .company-header,
+    .company-card .company-details>div:last-child {
+      justify-content: center !important;
+      gap: 15px !important;
+      flex-wrap: wrap !important;
+    }
+
+    .company-card .company-details {
+      width: 100% !important;
+    }
+
+    .company-card .company-details>div[style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+      text-align: center !important;
+    }
+
+    .company-card .company-details>div[style*="grid-template-columns"]>div {
+      border-right: none !important;
+      padding-right: 0 !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      padding-bottom: 15px !important;
+    }
+
+    .company-card .company-details>div[style*="grid-template-columns"]>div:last-child {
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+      padding-top: 15px !important;
+    }
+
+    .domain-badge {
+      margin-top: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px 30px;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+
+    .nav-back {
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-back:hover {
+      color: var(--primary-red);
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .status-available {
+      background: #10b981;
+    }
+
+    .status-pending {
+      background: #f59e0b;
+    }
+  </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+  <div class="main-wrapper" style="flex: 1;">
+    <!-- Standardized Navbar -->
+    <nav class="navbar">
+      <a href="{% url 'project_review:home' %}"
+        style="color: var(--btn-color, #f50e06); text-decoration:none; margin-left:8px; font-weight:bold;">&lt; Back</a>
+      <div class="logo">
+        <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
+      </div>
+    </nav>
+
+    <header class="hero-section">
+      <div class="domain-search-container">
+        <h1>The Bridge to <span style="color: var(--primary-red);">Exponential Capital</span></h1>
+        <form method="get" action="{% url 'project_review:search_domain' %}" class="search-panel">
+          <input type="text" name="q" placeholder="Explore target domains..." value="{{ query|default:'' }}"
+            class="domain-input" autocomplete="off" />
+          <button type="submit" class="search-trigger">Check Availability</button>
+        </form>
+
+        {% if query %}
+        <div class="domain-badge">
+          <div class="status-indicator {% if result %}status-available{% else %}status-pending{% endif %}">
+          </div>
+          <span class="badge-label">Status for "{{ query }}": </span>
+          <span class="{% if result %}badge-success-text{% else %}badge-warning-text{% endif %}">{% if result %}{{
+            result.available }}{% else %}Search Completed{% endif %}</span>
+        </div>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <aside class="sidebar-sticky">
+        <div class="filter-card">
+          <form id="filters-form" method="get" action="{% url 'project_review:search_domain' %}">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}" />{% endif %}
+
+            <div class="filter-group">
+              <h3>Industry Verticals</h3>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                {% for cat in available_categories %}
+                <label class="cat-item {% if cat in selected_categories %}active{% endif %}">
+                  {% if cat in selected_categories %}
+                  <input type="checkbox" name="category" value="{{ cat }}" checked onchange="this.form.submit();">
+                  {% else %}
+                  <input type="checkbox" name="category" value="{{ cat }}" onchange="this.form.submit();">
+                  {% endif %}
+                  <span>{{ cat }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="filter-group" style="margin-top: 30px;">
+              <h3>Target Rating</h3>
+              <div style="padding: 0 10px;">
+                <input type="range" name="min_rating" min="0" max="5" step="0.1" value="{{ min_rating|default:0 }}"
+                  class="rating-slider"
+                  oninput="this.nextElementSibling.querySelector('#rating-val').innerText = this.value"
+                  onchange="this.form.submit();">
+                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                  <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary-red);">Tier <span
+                      id="rating-val">{{ min_rating|default:0 }}</span>+</span>
+                  <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">5.0 MAX</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </aside>
+
+      <div class="results-panel">
+        <h2>Strategic Capital Partners ({{ initial_companies|length|add:remaining_companies|length }})</h2>
+
+        <div class="investor-grid">
+          {% include 'project_review/_company_list.html' with companies=initial_companies %}
+        </div>
+
+        {% if remaining_companies %}
+        <div id="remaining-pool" class="investor-grid" style="display:none; margin-top: 30px;">
+          {% include 'project_review/_company_list.html' with companies=remaining_companies %}
+        </div>
+        <div style="text-align: center; margin-top: 50px;">
+          <button id="load-more" class="search-trigger"
+            style="background: var(--card-bg, white); color: var(--text-main); border: 2px solid #e2e8f0; box-shadow: none;">Show More
+            Partners</button>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-left">
+        © MyWorld
+      </div>
+      <div class="footer-right">
+        <span>Contact: +91 0123456789</span>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('load-more')?.addEventListener('click', function () {
+      const rem = document.getElementById('remaining-pool');
+      if (rem) {
+        rem.style.display = 'grid';
+        this.parentElement.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+
+</html>

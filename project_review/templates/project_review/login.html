@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Project Review</title>
+    <link rel="stylesheet" href="{% static 'project_review/css/styles.css' %}?v=12">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+</head>
+
+<body id="body2">
+    <!-- Splash Overlay -->
+    <div id="splash" aria-hidden="true">
+        <div class="splash-card" id="splash-card">
+            <img id="splash-logo" src="{% static 'project_review/images/logo.png' %}" alt="Logo">
+            <p class="splash-text">our hassle free, smooth bridging companion</p>
+        </div>
+    </div>
+    <div class="login-page-container">
+        <!-- Left Side: Informative Content -->
+        <div class="info-side">
+            <h1 class="info-title">Register today with gateway for your carrier</h1>
+            <div class="info-features">
+                <div class="feature-item">
+                    <span class="feature-bullet"></span>
+                    <p>trusted companion for your ideas</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-bullet"></span>
+                    <p>Specialized support</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-bullet"></span>
+                    <p>We have established strategic partnerships with 50+ companies.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Login Card -->
+        <div class="login-side">
+            <div class="pos2">
+                <h2>Login</h2>
+
+                {% if messages %}
+                <div id="message-container"
+                    style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: var(--success-green, #28a745); color: white; padding: 16px; border-radius: 8px; z-index: 1001; font-size: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    {% for message in messages %}
+                    <span>{{ message }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Username or Email" name="username" required>
+                    <input type="password" placeholder="Password" name="password" required>
+                    <button type="submit" id="button">Login</button>
+                </form>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{% url 'project_review:forgot_password' %}"
+                        style="color: var(--btn-color, #f50e06); text-decoration: none;">Forgot Password?</a>
+                    <div style="margin-top:10px">
+                        <a href="{% url 'project_review:register' %}" style="color: var(--btn-color, #f50e06); text-decoration: none;">Create
+                            an account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const splash = document.getElementById('splash');
+            const card = document.getElementById('splash-card');
+            const logo = document.getElementById('splash-logo');
+            const messageContainer = document.getElementById('message-container');
+
+            // --- FLOW REFINEMENT ---
+            // Skip ONLY if we arrived from forgot-password or register (direct "Back to login" links)
+            const ref = document.referrer;
+            const isBackNavigation = ref.includes('forgot-password') || ref.includes('register');
+
+            if (isBackNavigation) {
+                if (splash) splash.style.display = 'none';
+            }
+            // Now, splash shows on every manual refresh and even during invalid login attempts
+            // -----------------------
+
+            function dismissSplash() {
+                if (!splash || splash.style.display === 'none') return;
+                splash.classList.add('dismiss');
+                splash.addEventListener('animationend', function () {
+                    splash.style.display = 'none';
+                }, { once: true });
+            }
+
+            if (logo) logo.addEventListener('click', dismissSplash);
+            if (splash) splash.addEventListener('click', dismissSplash);
+
+            // Interactive Background & 3D Tilt
+            document.addEventListener('mousemove', (e) => {
+                if (!splash || splash.style.display === 'none') return;
+
+                const { clientX, clientY } = e;
+                const xPct = (clientX / window.innerWidth) * 100;
+                const yPct = (clientY / window.innerHeight) * 100;
+
+                // Update global background glow
+                splash.style.setProperty('--mouse-x', `${xPct}%`);
+                splash.style.setProperty('--mouse-y', `${yPct}%`);
+
+                // 3D Card Tilt & Local Inner Glow
+                if (card) {
+                    const rect = card.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+
+                    // Tilt calculation
+                    const rotateX = (centerY - clientY) / 15;
+                    const rotateY = (clientX - centerX) / 15;
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+                    // Local mouse position inside card for the internal glow
+                    const localX = clientX - rect.left;
+                    const localY = clientY - rect.top;
+                    card.style.setProperty('--card-mouse-x', `${localX}px`);
+                    card.style.setProperty('--card-mouse-y', `${localY}px`);
+                }
+            });
+
+            // Reset tilt when mouse leaves
+            document.addEventListener('mouseleave', () => {
+                if (card) card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            });
+
+            // Non-blocking message display
+            if (messageContainer) {
+                setTimeout(() => {
+                    messageContainer.style.transition = 'opacity 0.5s ease';
+                    messageContainer.style.opacity = '0';
+                    setTimeout(() => { messageContainer.style.display = 'none'; }, 500);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+
+</html>

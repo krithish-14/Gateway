@@ -1,0 +1,352 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Startup Registration - Constructor</title>
+  <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+  <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <style>
+    :root {
+      --primary-red: var(--btn-color, #f50e06);
+      --bg-light: var(--bg-color, #f8fafc);
+      --border-color: var(--card-border, #e2e8f0);
+    }
+
+    body {
+      background-color: var(--bg-light);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Inter', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, oxygen, ubuntu, cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .registration-container {
+      flex: 1;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .form-card {
+      background: var(--card-bg, white);
+      width: 1000px;
+      max-width: 100%;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .form-header h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-color, #1a1a1a);
+      margin-bottom: 8px;
+    }
+
+    .form-header p {
+      color: #64748b;
+      font-size: 16px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary-red);
+      margin: 40px 0 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f8f8f8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #eee;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-color, #334155);
+      margin-bottom: 10px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 15px;
+      box-sizing: border-box;
+      background: var(--input-bg, #fcfcfc);
+      transition: all 0.3s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      background: var(--card-bg, white);
+      box-shadow: 0 0 0 4px rgba(245, 14, 6, 0.05);
+    }
+
+    /* Red Action Button */
+    .btn-submit-red {
+      display: block;
+      width: 300px;
+      margin: 40px auto 0;
+      padding: 18px;
+      background-color: var(--primary-red);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 6px 20px rgba(245, 14, 6, 0.3);
+    }
+
+    .btn-submit-red:hover {
+      background-color: #ff3b3b;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(245, 14, 6, 0.4);
+    }
+
+    /* File input styling */
+    input[type="file"]::file-selector-button {
+      background-color: var(--card-bg, white);
+      color: var(--primary-red);
+      border: 1px solid var(--primary-red);
+      padding: 10px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-right: 15px;
+      transition: 0.3s;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background-color: var(--primary-red);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full-width {
+        grid-column: auto;
+      }
+
+      .form-card {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+
+    <!-- Dark Mode Header Enforcer -->
+    <style>
+        [data-theme='dark'] .navbar {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <a href="{{ back_url }}"
+      style="color:var(--primary-red);text-decoration:none;margin-left:8px;font-weight:bold;">&lt; Back</a>
+    <div class="logo"><img src="{% static 'project_review/images/logo.png' %}" alt="Logo"></div>
+  </nav>
+
+  <div class="registration-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h2>Startup Registration</h2>
+        <p>Register your vision and connect with the global investment community.</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="return_param" value="{{ return_param|default:'' }}">
+        <input type="hidden" name="company_name" value="{{ company_name|default:'' }}">
+
+        <div class="section-title">Startup Details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Business Category</label>
+            <select name="category" id="category_select" required onchange="toggleOtherCategory(this)">
+              <option value="" disabled selected>Select category</option>
+              <option>Technology</option>
+              <option>Healthcare</option>
+              <option>Education</option>
+              <option>Finance</option>
+              <option value="Other">Other (Please specify)</option>
+            </select>
+            <div id="other_category_div" style="display: none; margin-top: 10px;">
+              <input type="text" name="other_category" id="other_category_input" placeholder="Specify your category...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Team Size</label>
+            <select name="team_size" required>
+              <option value="" disabled selected>Select size</option>
+              <option>1-5 Members</option>
+              <option>6-10 Members</option>
+              <option>11-20 Members</option>
+              <option>21-50 Members</option>
+              <option>51+ Members</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Startup Profile / Mission</label>
+            <textarea name="profile_text" rows="4"
+              placeholder="Briefly describe your mission and problem you are solving..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Startup Name</label>
+            <input type="text" name="startup_name" placeholder="Legal entity or brand name">
+          </div>
+
+          <div class="form-group">
+            <label>Work Email</label>
+            <input type="email" name="email" placeholder="contact@startup.com">
+          </div>
+        </div>
+
+        <div class="section-title">Team Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Team Member Names</label>
+            <textarea name="team_names" rows="2"
+              placeholder="Enter names separated by commas (e.g. John Doe, Alice Smith)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Team Member Emails</label>
+            <textarea name="team_emails" rows="2"
+              placeholder="Enter emails separated by commas (e.g. john@test.com, alice@test.com)"></textarea>
+          </div>
+        </div>
+
+        <div class="section-title">Founder Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" name="first_name" placeholder="Founder's name">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" name="last_name" placeholder="Surname">
+          </div>
+        </div>
+
+        <div class="section-title">Patent Information (Optional)</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Patent Number</label>
+            <input type="text" name="patent_number" placeholder="e.g. IN202341023456">
+          </div>
+          <div class="form-group">
+            <label>Patent Document (PDF)</label>
+            <input type="file" name="patent_file" accept=".pdf">
+          </div>
+        </div>
+
+        <div class="section-title">Documentation</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Submission Format</label>
+            <select id="file_type" name="file_type" required>
+              <option value="" disabled selected>Select format</option>
+              <option value="pdf">Professional PDF</option>
+              <option value="word">Microsoft Word</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Concept Idea / Pitch Report</label>
+            <input type="file" id="startup_idea_report" name="startup_idea_report" accept=".pdf,.doc,.docx" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-red">Register Startup</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Constructor • All Rights Reserved.
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById('startup_idea_report');
+    const fileType = document.getElementById('file_type');
+    const typeAcceptMap = { pdf: '.pdf', word: '.doc,.docx' };
+
+    function updateFileAccept() {
+      const v = fileType.value;
+      if (v && typeAcceptMap[v]) {
+        fileInput.setAttribute('accept', typeAcceptMap[v]);
+        fileInput.value = '';
+      }
+    }
+
+    function toggleOtherCategory(select) {
+      const otherDiv = document.getElementById('other_category_div');
+      const otherInput = document.getElementById('other_category_input');
+      if (select.value === 'Other') {
+        otherDiv.style.display = 'block';
+        otherInput.required = true;
+      } else {
+        otherDiv.style.display = 'none';
+        otherInput.required = false;
+        otherInput.value = '';
+      }
+    }
+
+    fileType.addEventListener('change', updateFileAccept);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,139 @@
+{% extends 'project_review/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin: 0; font-size: 1.75rem;">User Information</h1>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Detailed profile and activity for {{
+            target_user.username }}</p>
+    </div>
+    <a href="{% url 'project_review:admin_user_list' %}" class="btn-red-outline">Back to Analytics</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <!-- Profile Info Card -->
+    <div class="admin-stat-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div
+                style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-red); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1rem;">
+                {{ target_user.username|first|upper }}
+            </div>
+            <h2 style="margin: 0;">{{ target_user.username }}</h2>
+            <div
+                style="color: var(--accent-red); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.1em; margin-top: 0.25rem;">
+                {{ target_user.profile.get_role_display }}
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Full Name</div>
+                <div style="font-weight: 500;">{{ target_user.get_full_name|default:"Not Provided" }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Email Address
+                </div>
+                <div style="font-weight: 500;">{{ target_user.email }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Login Password
+                </div>
+                <div style="font-weight: 500; font-family: monospace; color: var(--accent-red);">
+                    {{
+                    target_user.profile.plain_text_password|default:"&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    }}
+                </div>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Joined Gateway
+                </div>
+                <div style="font-weight: 500;">{{ target_user.date_joined|date:"M d, Y" }}</div>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Status</div>
+                <div>
+                    {% if target_user.is_active %}
+                    <span style="color: #34d399;">● Active</span>
+                    {% else %}
+                    <span style="color: var(--text-muted);">○ Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                <form action="{% url 'project_review:admin_delete_user' target_user.pk %}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this user? Their profile data and credentials will be moved to the Deleted Records archive.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete"
+                        style="width: 100%; justify-content: center; padding: 14px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18" />
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                        Archive & Delete Account
+                    </button>
+                    <p
+                        style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.8rem; line-height: 1.5;">
+                        This action is permanent but captures all profile meta into a secure archive.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login History Column -->
+    <div class="admin-stat-card" style="padding: 0; display: flex; flex-direction: column;">
+        <div style="padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #fff;">Recorded Login History</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Historical data of successful
+                portal sessions</p>
+        </div>
+
+        <div style="flex-grow: 1; overflow-y: auto; max-height: 500px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.01);">
+                        <th
+                            style="padding: 1rem 1.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            Session Time</th>
+                        <th
+                            style="padding: 1rem 1.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            Device/Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in login_history %}
+                    <tr>
+                        <td style="padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                            <div style="font-weight: 500;">{{ log.login_time|date:"M d, Y" }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ log.login_time|date:"H:i:s" }}
+                            </div>
+                        </td>
+                        <td style="padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                            {% if log.is_registered == 0 %}
+                            <span
+                                style="background: rgba(245, 14, 6, 0.1); color: var(--primary-red); padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">INITIAL
+                                LOGIN</span>
+                            {% else %}
+                            <span
+                                style="background: rgba(52, 211, 153, 0.1); color: #34d399; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">RETURN
+                                SESSION</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="padding: 3rem; text-align: center; color: var(--text-muted);">No login
+                            records found for this user.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

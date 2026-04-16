@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Registration Invoice | Gateway</title>
+    <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+    <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <style>
+        :root {
+            --primary-red: var(--btn-color, #f50e06);
+            --dark-blue: var(--text-color, #0f172a);
+            --slate-600: #475569;
+            --slate-100: var(--bg-color, #f1f5f9);
+        }
+
+        body {
+            background-color: var(--slate-100);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark-blue);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg, white);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--slate-100);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .logo-section h1 {
+            color: var(--primary-red);
+            font-size: 28px;
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-size: 24px;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--slate-600);
+        }
+
+        .invoice-title p {
+            margin: 5px 0 0;
+            color: var(--slate-600);
+            font-size: 14px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .info-section h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--slate-600);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--slate-100);
+            padding-bottom: 8px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .info-item span {
+            font-weight: 600;
+            display: inline-block;
+            width: 140px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .details-table th {
+            text-align: left;
+            background: var(--slate-100);
+            padding: 12px 15px;
+            font-size: 14px;
+            color: var(--slate-600);
+        }
+
+        .details-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--slate-100);
+            font-size: 15px;
+            vertical-align: top;
+        }
+
+        .description-box {
+            background: var(--slate-100);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .description-box h4 {
+            margin-top: 0;
+            font-size: 14px;
+            color: var(--slate-600);
+            text-transform: uppercase;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--slate-600);
+            font-size: 13px;
+            margin-top: 60px;
+            border-top: 2px solid var(--slate-100);
+            padding-top: 20px;
+        }
+
+        .actions {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .btn-print {
+            background: var(--primary-red);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media print {
+
+            .actions,
+            .back-btn {
+                display: none;
+            }
+
+            body {
+                background: var(--card-bg, white);
+                padding: 0;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--slate-600);
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin: 0 auto;">
+        <a href="javascript:history.back()" class="back-btn">&larr; Back</a>
+
+        <div class="invoice-container">
+            <div class="invoice-header">
+                <div class="logo-section">
+                    <h1>GATEWAY</h1>
+                    <p style="font-size: 12px; color: var(--slate-600);">Empowering Innovation</p>
+                </div>
+                <div class="invoice-title">
+                    <h2>Registration Invoice</h2>
+                    <p>ID: #{{ registration.registration_number }}</p>
+                    <p>Date: {{ registration.created_at|date:"F d, Y" }}</p>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-section">
+                    <h3>Founder Details</h3>
+                    <div class="info-item"><span>Full Name:</span> {{ founder_full_name }}</div>
+                    <div class="info-item"><span>Email:</span> {{ registration.email }}</div>
+                    <div class="info-item"><span>User ID:</span> {{ registration.user.username }}</div>
+                </div>
+                <div class="info-section">
+                    <h3>Startup Identity</h3>
+                    <div class="info-item"><span>Startup Name:</span> {{ registration.startup_name }}</div>
+                    <div class="info-item"><span>Category:</span> {{ registration.category }}</div>
+                    <div class="info-item"><span>Team Size:</span> {{ registration.team_size }} Members</div>
+                </div>
+            </div>
+
+            <table class="details-table" style="margin-top:40px;">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Submitted Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Registration Target</strong></td>
+                        <td>{{ registration.company_name|default:"General Community" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Registration ID</strong></td>
+                        <td>{{ registration.registration_number }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Portal PIN</strong></td>
+                        <td><code>{{ registration.portal_password }}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Submission Status</strong></td>
+                        <td>Validated & Verified</td>
+                    </tr>
+                    {% if registration.startup_idea_report %}
+                    <tr>
+                        <td><strong>Idea Report</strong></td>
+                        <td><a href="{{ registration.startup_idea_report.url }}" target="_blank"
+                                style="color:var(--primary-red); font-weight:600;">Download Report ({{
+                                registration.file_type }})</a></td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+
+            <div class="description-box" style="margin-top: 30px;">
+                <h4>Idea Description / Profile Text</h4>
+                <p style="white-space:pre-line; font-size:14px; line-height:1.6;">{{ registration.profile_text }}</p>
+            </div>
+
+            {% if registration.team_members.all %}
+            <div class="info-section" style="margin-top: 30px;">
+                <h3>Team Members</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    {% for member in registration.team_members.all %}
+                    <div class="info-item">• {{ member.name }} ({{ member.email }})</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="footer-note">
+                <p>This is a system-generated document for your startup registration at MyWorld Gateway.</p>
+                <p>&copy; 2026 MyWorld Gateway. All rights reserved.</p>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button onclick="window.print()" class="btn-print">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                        d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-2-4h-8a2 2 0 00-2 2v4h12v-4a2 2 0 00-2-2z">
+                    </path>
+                </svg>
+                Print Invoice
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
