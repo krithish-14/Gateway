@@ -13,7 +13,7 @@ class UserProfile(models.Model):
         (ROLE_INVESTOR, 'Investor'),
         (ROLE_ADMIN, 'Admin'),
     ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_STARTUP)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_STARTUP, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     profile_image = models.ImageField(upload_to='project_review/profile_photos/', blank=True, null=True)
@@ -121,8 +121,8 @@ class Company(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
     rating_count = models.IntegerField(default=0)
     price_range = models.CharField(max_length=10, blank=True, null=True)
-    category = models.CharField(max_length=50, blank=True, null=True)
-    promoted = models.BooleanField(default=False)
+    category = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    promoted = models.BooleanField(default=False, db_index=True)
 
     # Investor / Detailed Profile fields
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='companies')
@@ -229,10 +229,10 @@ class Company(models.Model):
 class Registration(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     company_name = models.CharField(max_length=255, blank=True)
-    registration_number = models.CharField(max_length=5, unique=True)
-    category = models.CharField(max_length=100, blank=True)
+    registration_number = models.CharField(max_length=5, unique=True, db_index=True)
+    category = models.CharField(max_length=100, blank=True, db_index=True)
     team_size = models.IntegerField(default=1)
-    profile_text = models.TextField(blank=True, help_text="Startup Description")
+    profile_text = models.TextField(blank=True, help_text="Startup Description", db_index=False)
     startup_name = models.CharField(max_length=255, blank=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -389,3 +389,20 @@ class DirectMessage(models.Model):
 
     def __str__(self):
         return f"From {self.sender.username} to {self.recipient.username}: {self.body[:20]}"
+
+class AIChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ai_chats', db_index=True)
+    message = models.TextField()
+    response = models.TextField()
+    intent_tag = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ['timestamp']
+        indexes = [
+            models.Index(fields=['user', 'timestamp']),
+            models.Index(fields=['intent_tag']),
+        ]
+
+    def __str__(self):
+        return f"AI Chat ({self.intent_tag}) with {self.user.username} at {self.timestamp}"

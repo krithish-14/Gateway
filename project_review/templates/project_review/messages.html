@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
   <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=20.0"></script>
 
     <!-- Dark Mode Header Enforcer -->
     <style>
@@ -23,14 +23,26 @@
 <body>
   <style>
     :root {
-      --primary-red: var(--btn-color, #f50e06);
-      --sidebar-bg: var(--navbar-bg, #0f172a);
+      --primary-red: #f50e06;
+      --sidebar-bg: #0f172a;
       --accent-purple: #6c3bcf;
-      --bg-light: var(--bg-color, #f8fafc);
-      --text-main: var(--text-color, #1e293b);
-      --text-muted: var(--sub-text, #64748b);
-      --border-color: var(--card-border, #e2e8f0);
-      --glass-bg: var(--card-bg, rgba(255, 255, 255, 0.85));
+      --bg-light: #f8fafc;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: #ffffff;
+    }
+
+    /* Message Dark Mode Overrides */
+    [data-theme='dark'] {
+      --sidebar-bg: #000000;
+      --bg-light: #050505;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+      --glass-bg: rgba(15, 23, 42, 0.85);
+      --card-bg: #1e293b;
     }
 
     body {
@@ -208,7 +220,7 @@
 
     .meta .snippet {
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

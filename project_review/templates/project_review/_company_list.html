@@ -61,8 +61,7 @@
       <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
         {% if company.category %}
         <span
-          style="background: var(--input-bg, #eff6ff); color: var(--btn-color, #1e40af); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{
-          company.category }}</span>
+          style="background: var(--input-bg, #eff6ff); color: var(--btn-color, #1e40af); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{ company.category }}</span>
         {% else %}
         <span
           style="background: var(--bg-color, #f1f5f9); color: var(--sub-text, #475569); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Strategic
@@ -71,8 +70,7 @@
 
         {% if company.price_range %}
         <span
-          style="background: var(--input-bg, #f0fdf4); color: #166534; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{
-          company.price_range }}</span>
+          style="background: var(--input-bg, #f0fdf4); color: #166534; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{ company.price_range }}</span>
         {% endif %}
       </div>
       <a href="{% url 'project_review:company_detail_dynamic' company.pk %}?return=search_domain" class="search-trigger"

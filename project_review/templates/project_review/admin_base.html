@@ -1,13 +1,14 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title|default:"Gateway Admin" }}</title>
-    <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
+    <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=50">
     <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -31,7 +32,9 @@
             font-family: 'Outfit', sans-serif !important;
             display: block !important;
             overflow-x: hidden;
+            display: block !important;
         }
+
 
         .admin-navbar {
             height: 70px;
@@ -251,15 +254,7 @@
         }
     </style>
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
 
-    <!-- Dark Mode Header Enforcer -->
-    <style>
-        [data-theme='dark'] .navbar {
-            background-color: #000000 !important;
-            border-bottom: 2px solid #f50e06 !important;
-        }
-    </style>
 </head>
 
 <body>
@@ -269,7 +264,7 @@
             <span style="font-weight: 700; font-size: 1.35rem; color: #fff; letter-spacing: -0.02em;">GATEWAY <span
                     style="color: var(--primary-red);">ADMIN</span></span>
         </div>
-        <div style="display: flex; align-items: center; gap: 25px;">
+        <div class="nav-icons" style="display: flex; align-items: center; gap: 20px;">
             <div style="text-align: right;">
                 <div style="font-weight: 600; font-size: 0.95rem; color: #fff;">{{ user.username }}</div>
                 <div

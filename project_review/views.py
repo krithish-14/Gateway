@@ -79,8 +79,9 @@ def login_view(request):
             messages.success(request, "Login successful!")
             logger.info("Login success for user=%s", user.username)
 
-            # If this is the user's first login ever, send a welcome message
+            # If this is the user's first login ever, send a welcome message and trigger tutorial
             if is_first_login:
+                request.session['show_tutorial'] = True
                 PortalMessage.objects.get_or_create(
                     recipient=user,
                     sender_name='Gateway',
@@ -220,8 +221,9 @@ def reset_password_view(request, token):
 @login_required
 @never_cache
 def home_view(request):
-    # One-time bottom-right toast: pulled from session and cleared
+    # One-time bottom-right toast and tutorial trigger: pulled from session and cleared
     toast = request.session.pop('toast_notification', None)
+    show_tutorial = request.session.pop('show_tutorial', False)
     
     # Check user role and route to appropriate home page
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -262,6 +264,7 @@ def home_view(request):
 
         return render(request, 'project_review/home page2.html', {
             'toast': toast,
+            'show_tutorial': show_tutorial,
             'profile_complete': is_eligible,
             'profile': profile,
             'company': company,
@@ -287,6 +290,7 @@ def home_view(request):
 
     return render(request, 'project_review/home page.html', {
         'toast': toast,
+        'show_tutorial': show_tutorial,
         'companies': companies,
         'search_query': query
     })
@@ -1088,6 +1092,9 @@ def startup_registration_view(request):
     if not back_url:
         back_url = reverse('project_review:home')
 
+    # Save for success page backtrack
+    request.session['registration_back_url'] = back_url
+
     # Do NOT blindly redirect by any session registration number; only per company
 
     # Check if user already has a registration for this company
@@ -1138,23 +1145,29 @@ def startup_registration_view(request):
 
             registration.save()
 
-            # Send immediate registration confirmation with portal credentials
-            try:
-                # Build portal URL
-                portal_url = request.build_absolute_uri(reverse('project_review:portal'))
-                send_registration_email(
-                    email=registration.email,
-                    registration_number=registration.registration_number,
-                    company_name=registration.startup_name or registration.company_name,
-                    password=registration.portal_password,
-                    portal_url=portal_url
-                )
-            except Exception as e:
-                logger.error(f"Failed to send immediate registration email: {e}")
-
-            # Trigger Background Verification for Startup Registration synchronously
+            # Trigger Background Tasks (Verification + Email) asynchronously to keep form response fast
+            import threading
             from .tasks import run_startup_verification
-            run_startup_verification(registration.id)
+            
+            def background_tasks():
+                # 1. Send immediate registration confirmation email
+                try:
+                    portal_url = request.build_absolute_uri(reverse('project_review:portal'))
+                    send_registration_email(
+                        email=registration.email,
+                        registration_number=registration.registration_number,
+                        company_name=registration.startup_name or registration.company_name,
+                        password=registration.portal_password,
+                        portal_url=portal_url
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to send background registration email: {e}")
+                
+                # 2. Run verification
+                run_startup_verification(registration.id)
+
+            thread = threading.Thread(target=background_tasks)
+            thread.start()
             
             # Save team members
             team_names = request.POST.get('team_names', '')
@@ -1196,71 +1209,6 @@ def startup_registration_view(request):
                         registration=registration,
                         text=f"The startup '{registration.startup_name or registration.company_name}' has approached you for investment."
                     )
-
-            # Send confirmation email to the exact address provided in the form
-            try:
-                to_email = registration.email  # strictly use the email entered in the registration form
-                if to_email:
-                    company_line = registration.company_name or ''
-
-                    subject = f"Startup Registration Submitted: {company_line} ({reg_num})"
-                    portal_url = request.build_absolute_uri(reverse('project_review:portal'))
-                    full_name = f"{registration.first_name or ''} {registration.last_name or ''}".strip()
-                    text_body = (
-                        "Thank you for submitting your startup registration. Here is a copy of your details:\n\n"
-                        f"Name: {full_name}\n"
-                        f"Startup name: {registration.startup_name or ''}\n"
-                        f"Email: {registration.email or ''}\n"
-                        f"Company: {company_line}\n\n"
-                        f"Registration number: {reg_num}\n"
-                        f"Portal password: {portal_password}\n"
-                        f"Portal login URL: {portal_url}\n"
-                        "Do not share your portal password with anyone."
-                    )
-                    html_body = (
-                        f"<p>Thank you for submitting your startup registration. Here is a copy of your details:</p>"
-                        f"<ul>"
-                        f"<li><strong>Name:</strong> {full_name}</li>"
-                        f"<li><strong>Startup name:</strong> {registration.startup_name or ''}</li>"
-                        f"<li><strong>Email:</strong> {registration.email or ''}</li>"
-                        f"<li><strong>Company:</strong> {company_line}</li>"
-                        f"</ul>"
-                        f"<p><strong>Registration number:</strong> {reg_num}</p>"
-                        f"<p><strong>Portal password:</strong> <span style=\"color:#007bff;\">{portal_password}</span></p>"
-                        f"<p><strong>Portal login URL:</strong> <a href=\"{portal_url}\">{portal_url}</a></p>"
-                        f"<p><em>Do not share your portal password with anyone.</em></p>"
-                    )
-                    use_emailjs = bool(getattr(settings, 'EMAILJS_SERVICE_ID_REG', '') and getattr(settings, 'EMAILJS_TEMPLATE_ID_REG', '') and getattr(settings, 'EMAILJS_PUBLIC_KEY', '')) and getattr(settings, 'EMAIL_BACKEND', '') != 'django.core.mail.backends.locmem.EmailBackend'
-                    if use_emailjs:
-                        origin = f"{request.scheme}://{request.get_host()}"
-                        sent_count = send_registration_email(
-                            to_email,
-                            reg_num,
-                            registration.company_name or '',
-                            portal_password,
-                            getattr(settings, 'EMAILJS_SERVICE_ID_REG', ''),
-                            getattr(settings, 'EMAILJS_TEMPLATE_ID_REG', ''),
-                            getattr(settings, 'EMAILJS_PUBLIC_KEY', ''),
-                            origin=origin,
-                            portal_url=portal_url,
-                        )
-                    else:
-                        sent_count = send_transactional_email(
-                            to_email,
-                            subject,
-                            text_body,
-                            html_body,
-                        )
-                    if sent_count:
-                        messages.success(request, f"Registration completed. Confirmation email sent to {to_email}.")
-                    else:
-                        messages.warning(request, "Registration completed, but the email could not be sent.")
-                else:
-                    messages.error(request, "Registration email address is missing. Please enter your email.")
-            except Exception:
-                # Non-fatal: continue flow even if email fails
-                logger.exception("Failed to send registration email for reg=%s", reg_num)
-                messages.warning(request, "Registration completed, but sending the email failed.")
             # Store per-company registration number in session
             if registration.company_name:
                 request.session[f'registration_number_{registration.company_name}'] = reg_num
@@ -1318,11 +1266,14 @@ def share_ideas_view(request):
                 registration.team_size = actual_count
             registration.save()
             
-            # Trigger Background Verification for Startup Registration (General) synchronously
+            # Trigger Background Verification for Startup Registration (General) asynchronously
+            import threading
             from .tasks import run_startup_verification
-            run_startup_verification(registration.id)
+            thread = threading.Thread(target=run_startup_verification, args=(registration.id,))
+            thread.start()
             
             request.session['registration_number'] = reg_num
+            request.session['registration_back_url'] = reverse('project_review:home')
 
             messages.success(request, "Your idea has been shared with all investors!")
             return redirect(f"{reverse('project_review:registration_success')}?type=general")
@@ -1366,60 +1317,78 @@ def registration_success_view(request):
                 registration_number = registration.registration_number
 
     # derive back_url based on company_name with robust fallback
-    from .models import Company
-    db_company = Company.objects.filter(name=company_name).first()
-    if db_company:
-        back_url = reverse('project_review:company_detail_dynamic', args=[db_company.pk])
-    else:
-        company_back_map = {
-            'TCS': 'project_review:company',
-            'IBM': 'project_review:company2',
-            'Zoho': 'project_review:company3',
-            'Cognizant': 'project_review:company_cognizant',
-            'Amazon': 'project_review:company_amazon',
-            'HCLTech': 'project_review:company_hcltech',
-            'Infosys': 'project_review:company_infosys',
-            'Wipro': 'project_review:company_wipro',
-        }
-        if company_name in company_back_map:
-            back_url = reverse(company_back_map[company_name])
+    # Priority: session back_url > company lookup > return_param > home
+    final_back_url = request.session.get('registration_back_url')
+    
+    if not final_back_url and company_name:
+        from .models import Company
+        db_company = Company.objects.filter(name=company_name).first()
+        if db_company:
+            final_back_url = reverse('project_review:company_detail_dynamic', args=[db_company.pk])
         else:
-            back_url = reverse('project_review:home')
+            company_back_map = {
+                'TCS': 'project_review:company',
+                'IBM': 'project_review:company2',
+                'Zoho': 'project_review:company3',
+                'Cognizant': 'project_review:company_cognizant',
+                'Amazon': 'project_review:company_amazon',
+                'HCLTech': 'project_review:company_hcltech',
+                'Infosys': 'project_review:company_infosys',
+                'Wipro': 'project_review:company_wipro',
+            }
+            if company_name in company_back_map:
+                final_back_url = reverse(company_back_map[company_name])
+
+    if not final_back_url:
+        final_back_url = reverse('project_review:home')
 
     context = {
         'registration_number': registration_number,
         'registration': registration,
         'company_name': company_name,
-        'back_url': back_url,
+        'back_url': final_back_url,
     }
     return render(request, 'project_review/message.html', context)
 
 
 @login_required
 def startup_invoice_view(request):
-    # Try to find a registration for the current user
-    # If a registration_id is not provided, find the most recent one
     registration_id = request.GET.get('id')
     if registration_id:
         registration = get_object_or_404(Registration, id=registration_id)
-        # Security: Only owner or admin can see it
-        profile = getattr(request.user, 'profile', None)
-        is_admin = profile and profile.role == UserProfile.ROLE_ADMIN
-    # Pre-calculate values for the invoice to prevent template tag line-breaks
-    founder_full_name = f"{registration.first_name} {registration.last_name}"
+    else:
+        # Fallback to most recent for user
+        registration = Registration.objects.filter(user=request.user).order_by('-created_at').first()
+        if not registration:
+            messages.error(request, "No registration found.")
+            return redirect('project_review:home')
+
+    # Security: Only owner or admin can see it
+    profile = getattr(request.user, 'profile', None)
+    is_admin = profile and profile.role == UserProfile.ROLE_ADMIN
+    if not (is_admin or registration.user == request.user):
+        messages.error(request, "You do not have permission to view this invoice.")
+        return redirect('project_review:home')
+
+    # Verification Check: Invoice is only available after verification is done well
+    if not registration.verification_completed:
+        messages.warning(request, "Your registration is still undergoing verification. The invoice will be available shortly.")
+        return redirect('project_review:registration_success')
+
+    # Pre-calculate values for the invoice
+    founder_full_name = f"{registration.first_name} {registration.last_name}".strip() or registration.user.username
     similarity_score = f"{registration.idea_similarity_score:.1f}"
     authenticity_score = str(registration.idea_authenticity_score)
-    patent_num = registration.patent_number.upper() if registration.patent_number else ""
-    patent_registry = registration.patent_registry if registration.patent_registry else "Global Database"
-    patent_owner = registration.patent_owner if registration.patent_owner else "Founders"
-    patent_detailed_status = registration.patent_detailed_status if registration.patent_detailed_status else "Authenticated"
-    recommended_action = registration.recommended_action if registration.recommended_action else "Strategic analysis is being finalized by the neural verification engine."
+    patent_num = registration.patent_number.upper() if registration.patent_number else "NOT APPLICABLE"
+    patent_registry = registration.patent_registry if registration.patent_registry else "Not Verified"
+    patent_owner = registration.patent_owner if registration.patent_owner else "Not Verified"
+    patent_detailed_status = registration.patent_detailed_status if registration.patent_detailed_status else "Not Verified"
+    recommended_action = registration.recommended_action if registration.recommended_action else "Strategic analysis finalized."
     
-    # Calculate status color
     status_color = "#ef4444" 
     if registration.idea_status == 'Unique':
         status_color = "#10b981" 
-    elif 'Partial' in str(registration.idea_status):
+    elif registration.idea_status and 'Partial' in registration.idea_status:
         status_color = "#f59e0b"
 
     context = {
@@ -2064,3 +2033,121 @@ def unread_counts_api(request):
         'unread_messages_count': portal_msg_count + direct_msg_count,
     })
 
+
+@login_required
+def chatbot_view(request):
+    """Full screen chatbot environment with history."""
+    from .models import AIChatMessage
+    chats = AIChatMessage.objects.filter(user=request.user)
+    return render(request, 'project_review/ai_chatbot.html', {'chats': chats})
+
+@login_required
+def api_chatbot_ask(request):
+    """
+    Optimized Local NLP Engine:
+    - Uses 'intent_tag' indexing for high-speed retrieval.
+    - Simplified decision logic for efficiency.
+    - Expert-level KB with multi-paragraph responses.
+    """
+    import json
+    from .models import AIChatMessage
+    from django.utils import timezone
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            question = data.get('question', '').strip()
+            q_lower = question.lower()
+            
+            # 1. Fetch Context efficiently (Last 2 turns)
+            recent_context = AIChatMessage.objects.filter(user=request.user).only('message', 'intent_tag').order_by('-timestamp')[:2]
+            context_tags = [c.intent_tag for c in recent_context if c.intent_tag]
+            
+            # 2. Define High-Performance Knowledge Base
+            KB = {
+                'trust_score': {
+                    'keywords': ['trust', 'score', 'percentage', 'verified', 'status', 'level', '80', '100'],
+                    'response': (
+                        "Gateway's Trust Scoring system is a multi-dimensional verification framework designed to build radical transparency.\n\n"
+                        "• **0-50% (Baseline)**: Profile exists, identity confirmed.\n"
+                        "• **51-80% (Verified Strategist)**: Company metadata, team size, and geographical footprint verified.\n"
+                        "• **80-100% (Authenticated Disruptor)**: Intellectual Property (Patents/Trademarks) verified via Clarity Scan.\n\n"
+                        "High scores prioritize your profile in the Investor Dashboard global feed."
+                    )
+                },
+                'patent': {
+                    'keywords': ['patent', 'ip', 'intellectual property', 'document', 'upload', 'protection', 'idea'],
+                    'response': (
+                        "Protecting your Intellectual Property (IP) is central to our platform's mission.\n\n"
+                        "Uploading a patent triggers an automated **Patent Clarity Scan**. Once verified, your Trust Score instantly climbs to 100%. "
+                        "If you do not have a patent yet, you can still reach 80% by completing all other professional sections of your profile."
+                    )
+                },
+                'portal': {
+                    'keywords': ['pin', 'id', 'portal', 'access', 'login', 'credentials'],
+                    'response': (
+                        "Your **Registration ID** and **Portal PIN** are unique cryptographic tokens.\n\n"
+                        "They are generated only once at the end of the registration process. If lost, check your system-generated confirmation email. "
+                        "These credentials allow access to your Official Invoice and Verification Certificate in the Private Portal."
+                    )
+                },
+                'investors': {
+                    'keywords': ['investor', 'partner', 'amazon', 'hcl', 'cognizant', 'infosys', 'connect'],
+                    'response': (
+                        "We facilitate direct connections with industry titans like Amazon, Cognizant, and HCL.\n\n"
+                        "To maximize investor interest, ensure your Idea Description is focused on scalability and your Trust Score is above 80%. "
+                        "Investors use these metrics to filter for top-tier disruptive startups."
+                    )
+                }
+            }
+
+            # 3. Fast Intent Mapping
+            best_intent = None
+            max_hits = 0
+            
+            # Check current question for primary keywords
+            for intent, kb_data in KB.items():
+                hits = sum(1 for kw in kb_data['keywords'] if kw in q_lower)
+                # Boost if last context was same topic
+                if intent in context_tags:
+                    hits += 0.5
+                
+                if hits > max_hits:
+                    max_hits = hits
+                    best_intent = intent
+
+            # 4. Construct Expert Response
+            if best_intent:
+                response = KB[best_intent]['response']
+            elif any(w in q_lower for w in ['hi', 'hello', 'hey']):
+                response = f"Greetings, {request.user.first_name or request.user.username}. I am your Gateway Neural Assistant. I have indexed your profile and am ready to support your startup journey. What can I clarify for you today?"
+                best_intent = 'greeting'
+            elif 'thank' in q_lower:
+                response = "It is my duty to facilitate your success. If further assistance is required, do not hesitate to initiate another query."
+                best_intent = 'gratitude'
+            else:
+                response = "I am unable to map your query to my primary expert modules. I specialize in: Trust Scores, Patent Verification, Investor Connects, and Portal Access. Could you specify one of these?"
+                best_intent = 'unknown'
+
+            # 5. Optimized Persistence (storing intent_tag for future context)
+            AIChatMessage.objects.create(
+                user=request.user, 
+                message=question, 
+                response=response,
+                intent_tag=best_intent
+            )
+            return JsonResponse({'answer': response})
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'POST required'}, status=405)
+
+@login_required
+def api_chatbot_history(request):
+    """Fetch recent chat history for the user."""
+    from .models import AIChatMessage
+    chats = AIChatMessage.objects.filter(user=request.user).order_by('timestamp')
+    history = []
+    for c in chats:
+        history.append({'message': c.message, 'response': c.response})
+    return JsonResponse({'history': history})

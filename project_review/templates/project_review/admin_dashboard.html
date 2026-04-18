@@ -6,19 +6,19 @@
 <div
     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
     <div class="admin-stat-card">
-        <div style="font-size: 2.25rem; font-weight: 700; color: #fff;">{{ total_startups }}</div>
+        <div style="font-size: 2.25rem; font-weight: 700; color: var(--header-text, #fff);">{{ total_startups }}</div>
         <div
             style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px;">
             Total Startups</div>
     </div>
     <div class="admin-stat-card">
-        <div style="font-size: 2.25rem; font-weight: 700; color: #fff;">{{ total_investors }}</div>
+        <div style="font-size: 2.25rem; font-weight: 700; color: var(--header-text, #fff);">{{ total_investors }}</div>
         <div
             style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px;">
             Total Investors</div>
     </div>
     <div class="admin-stat-card">
-        <div style="font-size: 2.25rem; font-weight: 700; color: #fff;">{{ total_users }}</div>
+        <div style="font-size: 2.25rem; font-weight: 700; color: var(--header-text, #fff);">{{ total_users }}</div>
         <div
             style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 5px;">
             Total Registered Users</div>
@@ -30,7 +30,7 @@
     <!-- Main Startup Growth -->
     <div class="admin-stat-card" style="height: 380px; display: flex; flex-direction: column;">
         <h4
-            style="margin: 0 0 15px 0; font-size: 0.95rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+            style="margin: 0 0 15px 0; font-size: 0.95rem; color: var(--header-text, #fff); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
             Startup Growth Trends</h4>
         <div style="flex-grow: 1; min-height: 0;">
             <canvas id="startupChart"></canvas>
@@ -40,7 +40,7 @@
     <!-- Doughnut Industry View -->
     <div class="admin-stat-card" style="height: 380px; display: flex; flex-direction: column;">
         <h4
-            style="margin: 0 0 15px 0; font-size: 0.95rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+            style="margin: 0 0 15px 0; font-size: 0.95rem; color: var(--header-text, #fff); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
             Industry Breakdown</h4>
         <div style="flex-grow: 1; min-height: 0;">
             <canvas id="categoryChart"></canvas>
@@ -52,7 +52,7 @@
 <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
     <div class="admin-stat-card" style="height: 380px; display: flex; flex-direction: column;">
         <h4
-            style="margin: 0 0 15px 0; font-size: 0.95rem; color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+            style="margin: 0 0 15px 0; font-size: 0.95rem; color: var(--header-text, #fff); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
             Investor Onboarding Analytics</h4>
         <div style="flex-grow: 1; min-height: 0;">
             <canvas id="investorChart"></canvas>
@@ -64,8 +64,9 @@
 {% block extra_js %}
 <script>
     // Global Chart.js Styling
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+    Chart.defaults.borderColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
     Chart.defaults.font.family = "'Outfit', sans-serif";
 
     const chartConfig = {

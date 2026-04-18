@@ -185,7 +185,7 @@
         }
     </style>
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=20.0"></script>
 </head>
 
 <body>
@@ -248,8 +248,7 @@
                     <tr>
                         <td><strong>Idea Report</strong></td>
                         <td><a href="{{ registration.startup_idea_report.url }}" target="_blank"
-                                style="color:var(--primary-red); font-weight:600;">Download Report ({{
-                                registration.file_type }})</a></td>
+                                style="color:var(--primary-red); font-weight:600;">Download Report ({{ registration.file_type }})</a></td>
                     </tr>
                     {% endif %}
                 </tbody>

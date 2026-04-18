@@ -73,5 +73,8 @@ urlpatterns = [
     path('portal/patent-services/<int:pk>/', views.patent_services_view, name='patent_services'),
     path('portal/certificate/<int:pk>/', views.view_certificate, name='view_certificate'),
     path('api/unread-counts/', views.unread_counts_api, name='api_unread_counts'),
+    path('chatbot/', views.chatbot_view, name='chatbot'),
+    path('api/chatbot/ask/', views.api_chatbot_ask, name='api_chatbot_ask'),
+    path('api/chatbot/history/', views.api_chatbot_history, name='api_chatbot_history'),
 ]
 

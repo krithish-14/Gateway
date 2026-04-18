@@ -1,0 +1,380 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway AI - Assistant</title>
+    <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=43">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=10.0"></script>
+    <style>
+        [data-theme='dark'] .chat-header {
+            background-color: #000 !important;
+            border-bottom: 2px solid #f50e06 !important;
+        }
+        [data-theme='dark'] #chat-messages {
+            background: #0f172a !important;
+        }
+        [data-theme='dark'] .chat-footer {
+            background: #1e293b !important;
+            border-top: 1px solid #334155 !important;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif !important;
+            background: var(--bg-color, #f1f5f9);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-color, #0f172a);
+            overflow: hidden;
+        }
+
+        .chat-full-container {
+            width: 900px;
+            max-width: 95%;
+            height: 85vh;
+            background: var(--card-bg, #fff);
+            border-radius: 30px;
+            box-shadow: var(--card-shadow, 0 25px 70px rgba(0,0,0,0.15));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--card-border, rgba(255,255,255,0.1));
+            position: relative;
+        }
+
+        .chat-header {
+            background: var(--navbar-bg, #000);
+            color: var(--navbar-text, white);
+            padding: 20px 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--btn-color, #f50e06);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-left img {
+            width: 35px;
+            height: 35px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--bg-color, #fafafa);
+            scrollbar-width: thin;
+            scrollbar-color: #f50e06 #f1f5f9;
+        }
+
+        [data-theme='dark'] #chat-messages {
+            background: #0f172a;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+        }
+
+        .message-wrapper.user { align-items: flex-end; }
+        .message-wrapper.bot { align-items: flex-start; }
+
+        .message {
+            max-width: 75%;
+            padding: 16px 22px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .user .message {
+            background: var(--btn-color, #f50e06);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot .message {
+            background: var(--card-bg, white);
+            color: var(--text-color, #334155);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--card-border, #e2e8f0);
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            padding: 5px;
+            font-size: 0.8rem;
+        }
+
+        .message-wrapper:hover .copy-btn { opacity: 1; }
+
+        .quick-chips {
+            padding: 10px 40px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            background: var(--card-bg, white);
+            border-top: 1px solid var(--card-border, #f1f5f9);
+        }
+
+        .chip {
+            background: var(--bg-color, #f8fafc);
+            border: 1px solid var(--card-border, #e2e8f0);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-color);
+        }
+
+        .chip:hover {
+            border-color: #f50e06;
+            color: #f50e06;
+        }
+
+        .chat-footer {
+            padding: 25px 40px;
+            background: var(--card-bg, white);
+            border-top: 1px solid var(--card-border, #f1f5f9);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 2px solid var(--card-border, #eef2f6);
+            outline: none;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            background: var(--bg-color, #f8fafc);
+            color: var(--text-color);
+        }
+
+        .chat-input:focus {
+            border-color: #f50e06;
+        }
+
+        .btn-send {
+            background: #f50e06;
+            color: white;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 20px rgba(245, 14, 6, 0.2);
+        }
+
+        .btn-send:hover {
+            background: #d10c05;
+            transform: translateY(-2px);
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn:hover {
+            background: #f50e06;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-full-container">
+        <div class="chat-header">
+            <div class="header-left">
+                <img src="{% static 'project_review/images/robot.png' %}" alt="Bot">
+                <h1>Neural Assistant</h1>
+            </div>
+            <div class="header-right nav-icons">
+                <button class="header-btn" onclick="exportChat()"><i class="fas fa-download"></i> Export</button>
+                <button class="header-btn" onclick="clearChat()"><i class="fas fa-trash"></i> Clear</button>
+                <a href="{% url 'project_review:home' %}" class="header-btn"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </div>
+
+        <div id="chat-messages">
+            {% if chats %}
+                {% for chat in chats %}
+                    <div class="message-wrapper user">
+                        <div class="message">{{ chat.message }}</div>
+                        <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                    <div class="message-wrapper bot">
+                        <div class="message">{{ chat.response }}</div>
+                        <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="message-wrapper bot">
+                    <div class="message">Greetings. I am the Gateway Neural Assistant. How may I facilitate your startup's growth today?</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="quick-chips">
+            <div class="chip" onclick="quickAsk('Explain Trust Scores')">📊 Trust Scores</div>
+            <div class="chip" onclick="quickAsk('How to verify Patent?')">📜 Patent Verification</div>
+            <div class="chip" onclick="quickAsk('Find Investors')">🤝 Investor Connect</div>
+            <div class="chip" onclick="quickAsk('Portal Credentials')">🔑 Portal Login</div>
+        </div>
+
+        <div class="chat-footer">
+            <div class="input-group">
+                <input type="text" id="user-input" class="chat-input" placeholder="Type your query here..." onkeypress="if(event.key==='Enter') sendMessage()">
+            </div>
+            <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+
+        function quickAsk(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            userInput.value = '';
+
+            const loadingMsgWrapper = appendMessage('Consulting Neural Modules...', 'bot', true);
+            const loadingMsg = loadingMsgWrapper.querySelector('.message');
+
+            try {
+                const response = await fetch("{% url 'project_review:api_chatbot_ask' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ question: text })
+                });
+                const data = await response.json();
+                loadingMsg.textContent = data.answer || "No response received.";
+                loadingMsgWrapper.classList.remove('loading-state');
+            } catch (error) {
+                loadingMsg.textContent = "Neural bridge disconnected. Re-trying...";
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendMessage(text, side, isLoading = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${side}`;
+            if(isLoading) wrapper.classList.add('loading-state');
+
+            const content = `
+                <div class="message">${text}</div>
+                <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
+            `;
+            wrapper.innerHTML = content;
+            chatMessages.appendChild(wrapper);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return wrapper;
+        }
+
+        function copyText(btn) {
+            const text = btn.previousElementSibling.textContent;
+            navigator.clipboard.writeText(text);
+            const icon = btn.querySelector('i');
+            icon.className = 'fas fa-check';
+            setTimeout(() => icon.className = 'far fa-copy', 2000);
+        }
+
+        function exportChat() {
+            let content = "Gateway Neural Assistant - Chat Transcript\n";
+            content += "========================================\n\n";
+            document.querySelectorAll('.message-wrapper').forEach(w => {
+                const side = w.classList.contains('user') ? "You: " : "AI: ";
+                const text = w.querySelector('.message').textContent;
+                content += side + text + "\n\n";
+            });
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gateway-chat-history.txt';
+            a.click();
+        }
+
+        function clearChat() {
+            if(confirm("Permanently clear your session history?")) {
+                chatMessages.innerHTML = '<div class="message-wrapper bot"><div class="message">History cleared. New session started.</div></div>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -9,7 +9,9 @@
   <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
   <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=10.0"></script>
   
   <style>
     :root {
@@ -250,7 +252,6 @@
     }
   </style>
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
 
     <!-- Dark Mode Header Enforcer -->
     <style>

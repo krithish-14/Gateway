@@ -417,7 +417,7 @@
         }
     </style>
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=20.0"></script>
 
     <!-- Dark Mode Header Enforcer -->
     <style>
@@ -430,7 +430,7 @@
 
 <body>
     <nav class="navbar">
-        <a href="{% url 'project_review:home' %}" 
+        <a href="{% url 'project_review:portal' %}" 
            style="color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.95rem;">&lt; Back</a>
         <div class="logo">
             <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
@@ -444,8 +444,7 @@
                 <h1>Verification Insight</h1>
                 <div class="company-subtitle">
                     <i data-lucide="shield-check" style="color: var(--success);"></i>
-                    <span>Analyzing integrity for <strong>{{ reg_obj.startup_name|default:reg_obj.company_name
-                            }}</strong></span>
+                    <span>Analyzing integrity for <strong>{{ reg_obj.startup_name|default:reg_obj.company_name }}</strong></span>
                 </div>
             </div>
 
@@ -507,8 +506,7 @@
                             {% elif reg_obj.idea_status == 'Rejected' or reg_obj.idea_status == 'Duplicate' %}
                             <span class="status-badge pill-danger">Rejected / Match Detected</span>
                             {% else %}
-                            <span class="status-badge pill-blue">{{ reg_obj.idea_status|default:"Processing..."
-                                }}</span>
+                            <span class="status-badge pill-blue">{{ reg_obj.idea_status|default:"Processing..." }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -576,14 +574,11 @@
                                     <span>Rights<br>Authenticated</span>
                                 </div>
                                 {% elif reg_obj.patent_status == 'Rejected' or reg_obj.patent_status == 'Invalid' %}
-                                <div
-                                    style="color: var(--danger); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                <div style="color: var(--danger); font-weight: 700; display: flex; align-items: center; gap: 8px;">
                                     <i data-lucide="x-circle"></i> Validation Failed
                                 </div>
-                                {% elif reg_obj.patent_status == 'Not Submitted' or reg_obj.patent_status == 'Not
-                                Provided' %}
-                                <div
-                                    style="color: var(--warning); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                {% elif reg_obj.patent_status == 'Not Submitted' or reg_obj.patent_status == 'Not Provided' %}
+                                <div style="color: var(--warning); font-weight: 700; display: flex; align-items: center; gap: 8px;">
                                     <i data-lucide="alert-circle"></i> Not Submitted
                                 </div>
                                 {% else %}
@@ -740,6 +735,11 @@
                     </div>
                     {% endif %}
 
+                    <a href="{% url 'project_review:startup_invoice' %}?id={{ reg_obj.id }}" class="btn-glow" style="background: var(--success); margin-bottom: 1rem;">
+                        <i data-lucide="file-text"></i>
+                        Generate Official Invoice
+                    </a>
+                    
                     <a href="{% url 'project_review:home' %}" class="btn-glow">
                         <i data-lucide="layout-grid"></i>
                         Return to Hub

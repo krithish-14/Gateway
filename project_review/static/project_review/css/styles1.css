@@ -1453,3 +1453,60 @@ input {
     font-size: 13px;
     color: var(--text-color, #1e293b);
 }
+
+/* --- Emergency Dark Mode Overrides for Legacy Pages --- */
+[data-theme='dark'] body.notif-page-bg,
+[data-theme='dark'] .notif-page-bg {
+    background-color: var(--bg-color) !important;
+}
+
+[data-theme='dark'] .notif-card-alt {
+    background: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme='dark'] .notif-sub-text {
+    color: var(--sub-text) !important;
+}
+
+[data-theme='dark'] .notif-time-point {
+    background: var(--navbar-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Invoice and Portal Success Pages */
+[data-theme='dark'] .invoice-box,
+[data-theme='dark'] .success-card-alt,
+[data-theme='dark'] .registration-card {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+/* About and Static Pages */
+[data-theme='dark'] .about-section,
+[data-theme='dark'] .mission-card {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+/* Share Ideas Page */
+[data-theme='dark'] .step-card {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Cross-page consistency fix for hardcoded white backgrounds */
+[data-theme='dark'] [style*="background: white"],
+[data-theme='dark'] [style*="background-color: white"],
+[data-theme='dark'] [style*="background: #fff"],
+[data-theme='dark'] [style*="background-color: #fff"],
+[data-theme='dark'] [style*="background: #ffffff"],
+[data-theme='dark'] [style*="background-color: #ffffff"] {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}

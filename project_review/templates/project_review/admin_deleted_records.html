@@ -39,10 +39,8 @@
                 <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
                     <div style="font-weight: 600; color: #fff;">{{ r.username }}</div>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">{{ r.email }}</div>
-                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">Joined: {{ r.date_joined|date:"M d,
-                        Y" }}</div>
-                    <div style="font-size: 0.75rem; color: #666;">Last Login: {{ r.last_login|date:"M d,
-                        Y"|default:"Never" }}</div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">Joined: {{ r.date_joined|date:"M d, Y" }}</div>
+                    <div style="font-size: 0.75rem; color: #666;">Last Login: {{ r.last_login|date:"M d, Y"|default:"Never" }}</div>
                 </td>
                 <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
                     <div style="margin-bottom: 4px;">
@@ -78,9 +76,7 @@
                             <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">
                                 Account
                                 Password</div>
-                            <div style="font-family: monospace; color: var(--accent-red); font-size: 0.9rem;">{{
-                                r.plain_text_password }}
-                            </div>
+                            <div style="font-family: monospace; color: var(--accent-red); font-size: 0.9rem;">{{ r.plain_text_password }}</div>
                         </div>
                         {% endif %}
                     </div>
@@ -90,8 +86,7 @@
                 </td>
                 <td style="padding: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.03);">
                     <div style="font-weight: 500; color: var(--accent-red);">{{ r.deleted_at|date:"M d, Y" }}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">at {{
-                        r.deleted_at|date:"H:i:s" }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">at {{ r.deleted_at|date:"H:i:s" }}</div>
 
                     <form action="{% url 'project_review:admin_restore_user' r.pk %}" method="POST"
                         onsubmit="return confirm('Restore this user to the active platform?');">

@@ -10,19 +10,22 @@
     <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             font-family: 'Outfit', sans-serif !important;
         }
+    </style>
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=4.0"></script>
 
-        /* Dark Mode Header Enforcer */
+    <!-- Dark Mode Header Enforcer -->
+    <style>
         [data-theme='dark'] .navbar {
             background-color: #000000 !important;
             border-bottom: 2px solid #f50e06 !important;
         }
     </style>
-    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
 </head>
 
 <body>
@@ -66,14 +69,14 @@
         <!-- Navigation Bar -->
         <!-- Navigation Bar -->
         <nav class="navbar">
-            <div class="logo">
-                <a href="{% url 'project_review:home' %}">
-                    <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
-                </a>
-            </div>
+        <div class="logo">
+            <a href="{% url 'project_review:home' %}" id="nav-logo">
+                <img src="{% static 'project_review/images/logo.png' %}" alt="Logo">
+            </a>
+        </div>
 
-            <div class="center-nav">
-                <form action="{% url 'project_review:home' %}" method="GET" class="search-bar">
+        <div class="center-nav">
+                <form action="{% url 'project_review:home' %}" method="GET" class="search-bar" id="search-section">
                     <div style="position: relative; width: 50%; display: flex; align-items: center;">
                         <input type="text" name="q" placeholder="Search investors, category or focus..."
                             value="{{ search_query|default:'' }}"
@@ -89,10 +92,10 @@
 
                 <!-- New Connects Menu below Search Bar -->
                 <div class="connects-bar">
-                    <a href="{% url 'project_review:profile' %}" class="nav-link">My Profile</a>
-                    <a href="{% url 'project_review:share_ideas' %}" class="nav-link">Share Your Ideas</a>
-                    <a href="{% url 'project_review:search_domain' %}" class="nav-link">Search Domain</a>
-                    <div class="menu nav-dropdown-wrapper">
+                    <a href="{% url 'project_review:profile' %}" class="nav-link" id="profile-btn">My Profile</a>
+                    <a href="{% url 'project_review:share_ideas' %}" class="nav-link" id="ideas-btn">Share Your Ideas</a>
+                    <a href="{% url 'project_review:search_domain' %}" class="nav-link" id="domain-btn">Search Domain</a>
+                    <div class="menu nav-dropdown-wrapper" id="portal-dropdown">
                         <a href="{% url 'project_review:portal' %}" class="nav-link">Personal Portal <span
                                 style="font-size: 10px; margin-left: 4px;">▼</span></a>
                         <ul class="dropdown" style="top: 30px; left: 0; right: auto; width: 220px;">
@@ -105,9 +108,16 @@
                 </div>
             </div>
 
-            <!-- Navbar Icons: Notifications and Messages -->
-            <div class="nav-icons">
+            <!-- Navbar Icons: Guide, Notifications and Messages -->
+            <div class="nav-icons" style="display: flex; align-items: center; gap: 15px;">
+                <button id="theme-toggle" class="icon-btn theme-toggle-btn" style="background: #3b82f6; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; outline: none; transition: transform 0.2s;">
+                    <i class="fas fa-moon" style="color: white; font-size: 16px;"></i>
+                </button>
+                <a href="javascript:void(0)" id="tutorial-shortcut" class="icon-btn icon-btn--bot" aria-label="Tutorial Guide" onclick="toggleChatbotMenu()" style="background: #3b82f6; border-radius: 50%; width: 32px; height: 32px; margin-right: 5px;">
+                    <img class="icon-img" src="{% static 'project_review/images/robot.png' %}" alt="Guide" width="22" height="22" style="filter: brightness(0) invert(1);" />
+                </a>
                 <a href="{% url 'project_review:notifications' %}"
+                    id="notifications-btn"
                     class="icon-btn icon-btn--bell {% if unread_notifications_count > 0 %}has-new{% endif %}"
                     aria-label="Notifications">
                     <img class="icon-img" src="{% static 'project_review/images/notification.png' %}"
@@ -118,6 +128,7 @@
                 </a>
 
                 <a href="{% url 'project_review:messages' %}"
+                    id="messages-btn"
                     class="icon-btn icon-btn--msg {% if unread_messages_count > 0 %}has-new{% endif %}"
                     aria-label="Messages">
                     <img class="icon-img" src="{% static 'project_review/images/message.png' %}" alt="Messages icon"
@@ -205,7 +216,238 @@
     </footer>
 
     <script src="{% static 'project_review/js/live_updates.js' %}"></script>
+    <!-- AI Chatbot Modal -->
+    <div id="chatbot-modal" class="chatbot-theme-aware" style="display: none; position: fixed; right: 30px; bottom: 90px; width: 350px; min-width: 350px; height: 500px; min-height: 500px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 10001; flex-direction: column; border: 1px solid #f50e06; overflow: hidden; animation: slideIn 0.3s ease-out; box-sizing: border-box;">
+        <div style="background: #000; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="{% static 'project_review/images/robot.png' %}" width="25" style="filter: brightness(0) invert(1);">
+                <span style="font-weight: 700;">Gateway AI</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="{% url 'project_review:chatbot' %}" title="Wide Screen" style="color: white; text-decoration: none; font-size: 18px;">⛶</a>
+                <button onclick="toggleChatbotMenu()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+            </div>
+        </div>
+        
+        <div id="modal-chat-messages" style="flex: 1; padding: 15px; overflow-y: auto; background: inherit; display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;">
+            <div class="bot-msg-bubble">
+                Hello! How can I help you today?
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; width: 100%;">
+                <button onclick="startGuidedTutorial()" style="background: #fdf2f2; color: #f50e06; border: 1px solid #fecaca; padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 600; width: 100%;">🚀 Start Guided Tutorial</button>
+            </div>
+        </div>
+
+        <div class="modal-chips-container" style="padding: 10px 15px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid rgba(0,0,0,0.05); background: inherit; width: 100%; box-sizing: border-box;">
+            <div class="modal-chip" onclick="quickAskModal('Explain Trust Scores')">📊 Trust Scores</div>
+            <div class="modal-chip" onclick="quickAskModal('Patent Verification')">📜 Patent Verification</div>
+            <div class="modal-chip" onclick="quickAskModal('Investor Connect')">🤝 Investor Connect</div>
+            <div class="modal-chip" onclick="quickAskModal('Portal Login')">🔑 Portal Login</div>
+        </div>
+
+        <div class="modal-footer-chat" style="padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; width: 100%; box-sizing: border-box; align-items: center;">
+            <input type="text" id="modal-user-input" placeholder="Type a message..." style="flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 8px 15px; font-size: 13px; box-sizing: border-box;" onkeypress="if(event.key==='Enter') sendModalMessage()">
+            <button onclick="sendModalMessage()" style="background: #f50e06; border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; flex-shrink: 0;">→</button>
+        </div>
+    </div>
+
+    <style>
+        /* Theme Aware Modal Styles */
+        [data-theme='dark'] #chatbot-modal {
+            background: #1e293b !important;
+            border-color: #f50e06 !important;
+            color: white;
+        }
+        
+        [data-theme='dark'] #modal-chat-messages {
+            background: #0f172a !important;
+        }
+
+        .bot-msg-bubble {
+            background: #e2e8f0; 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            align-self: flex-start;
+            color: #1e293b;
+            max-width: 80%;
+        }
+
+        .user-msg-bubble {
+            background: #f50e06; 
+            color: white; 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            align-self: flex-end;
+            max-width: 80%;
+        }
+
+        [data-theme='dark'] .bot-msg-bubble {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        [data-theme='dark'] .modal-footer-chat {
+            background: #1e293b;
+            border-color: #334155 !important;
+        }
+
+        [data-theme='dark'] #modal-user-input {
+            background: #0f172a;
+            border-color: #334155;
+            color: white;
+        }
+
+        .modal-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 12px;
+        }
+
+        .modal-chip {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #475569;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .modal-chip:hover {
+            background: #fdf2f2;
+            border-color: #f50e06;
+            color: #f50e06;
+        }
+
+        [data-theme='dark'] .modal-chip {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Essential Tutorial Dark Mode Overrides */
+        [data-theme='dark'] #tutorial-bubble {
+            background: #1e293b !important;
+            color: #f1f5f9 !important;
+            border-color: #f50e06 !important;
+        }
+        [data-theme='dark'] #tutorial-text {
+            color: #f1f5f9 !important;
+        }
+        [data-theme='dark'] #tutorial-skip {
+            background: #334155 !important;
+            color: #94a3b8 !important;
+        }
+    </style>
+
+    <script src="{% static 'project_review/js/tutorial.js' %}?v=1.5"></script>
     <script>
+        let historyLoaded = false;
+        async function toggleChatbotMenu() {
+            const modal = document.getElementById('chatbot-modal');
+            const isOpening = modal.style.display === 'none';
+            modal.style.display = isOpening ? 'flex' : 'none';
+            
+            if (isOpening && !historyLoaded) {
+                await loadChatHistory();
+                historyLoaded = true;
+            }
+        }
+
+        async function loadChatHistory() {
+            try {
+                const response = await fetch("{% url 'project_review:api_chatbot_history' %}");
+                const data = await response.json();
+                if (data.history && data.history.length > 0) {
+                    const charBox = document.getElementById('modal-chat-messages');
+                    // Keep the welcome message and tutorial buttons but add history after them
+                    data.history.forEach(chat => {
+                        appendUserMessage(chat.message);
+                        appendBotMessage(chat.response);
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to load history", e);
+            }
+        }
+
+        function appendUserMessage(text) {
+            const charBox = document.getElementById('modal-chat-messages');
+            const div = document.createElement('div');
+            div.className = 'user-msg-bubble';
+            div.textContent = text;
+            charBox.appendChild(div);
+            charBox.scrollTop = charBox.scrollHeight;
+        }
+
+        function startGuidedTutorial() {
+            toggleChatbotMenu();
+            if (window.startTutorial) window.startTutorial();
+        }
+
+        function appendBotMessage(text) {
+            const charBox = document.getElementById('modal-chat-messages');
+            const div = document.createElement('div');
+            div.className = 'bot-msg-bubble';
+            div.textContent = text;
+            charBox.appendChild(div);
+            charBox.scrollTop = charBox.scrollHeight;
+        }
+
+        function quickAskModal(text) {
+            document.getElementById('modal-user-input').value = text;
+            sendModalMessage();
+        }
+
+        async function sendModalMessage() {
+            const input = document.getElementById('modal-user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendUserMessage(text);
+            input.value = '';
+
+            // Simulated AI Thinking
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.style.cssText = "background: #f1f5f9; color: #64748b; padding: 10px 15px; border-radius: 12px; font-size: 11px; align-self: flex-start; font-style: italic; border: 1px dashed #cbd5e1;";
+            thinkingDiv.textContent = "Neural Analysis in progress...";
+            const charBox = document.getElementById('modal-chat-messages');
+            charBox.appendChild(thinkingDiv);
+            charBox.scrollTop = charBox.scrollHeight;
+
+            try {
+                const response = await fetch("{% url 'project_review:api_chatbot_ask' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ question: text })
+                });
+                const data = await response.json();
+                charBox.removeChild(thinkingDiv);
+                appendBotMessage(data.answer);
+            } catch (e) {
+                charBox.removeChild(thinkingDiv);
+                appendBotMessage("The neural bridge is currently unstable. Please re-establish connection.");
+            }
+        }
+
+        {% if show_tutorial %}
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                if (window.startTutorial) window.startTutorial();
+            }, 1000);
+        });
+        {% endif %}
 
         // Handle dropdown hover/click for robust behavior
         document.querySelectorAll('.menu').forEach(menu => {

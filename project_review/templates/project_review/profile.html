@@ -8,8 +8,22 @@
   <title>My Profile Settings</title>
   <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
   <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <!-- Cropper.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+  <script src="{% static 'project_review/js/theme_toggle.js' %}?v=10.0"></script>
+
+  <!-- Dark Mode Header Enforcer -->
+  <style>
+      [data-theme='dark'] .navbar {
+          background-color: #000000 !important;
+          border-bottom: 2px solid #f50e06 !important;
+      }
+      [data-theme='dark'] .profile-pic-large {
+          background: #1e293b !important;
+      }
+  </style>
   <style>
     :root {
       --primary-red: var(--btn-color, #f50e06);
@@ -471,9 +485,24 @@
     [data-theme='dark'] .circular-progress {
       background: conic-gradient(var(--primary-red) calc(var(--percentage) * 1%), #334155 0);
     }
+
+    /* Guaranteed Pure CSS Theme Highlighting */
+    [data-theme='light'] #theme-light-card,
+    [data-theme='dark'] #theme-dark-card {
+        border-color: var(--primary-red) !important;
+        box-shadow: 0 0 0 3px rgba(245, 14, 6, 0.15) !important;
+        background: rgba(245, 14, 6, 0.05);
+    }
+
+    /* Reset non-active cards */
+    [data-theme='dark'] #theme-light-card,
+    [data-theme='light'] #theme-dark-card {
+        border-color: var(--border-color);
+        box-shadow: none;
+        background: transparent;
+    }
   </style>
   <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
   <script>
     // Theme logic defined in head to ensure availability
     // Theme logic defined in head to ensure availability
@@ -481,43 +510,14 @@
       console.log('[Profile] Requested theme transition to:', theme);
       if (window.setPreference) {
         window.setPreference(theme);
-        if (window.updateThemeCards) window.updateThemeCards(theme);
       } else {
-        console.warn('[Profile] window.setPreference not found, applying user-specific storage key directly');
-        const getCookie = (name) => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return 'guest';
-        };
-        const storageKey = 'theme-preference-' + getCookie('theme_user_id');
+        console.warn('[Profile] window.setPreference not found');
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem(storageKey, theme);
-        if (window.updateThemeCards) window.updateThemeCards(theme);
-      }
-    }
-
-    function updateThemeCards(theme) {
-      const lightCard = document.getElementById('theme-light-card');
-      const darkCard = document.getElementById('theme-dark-card');
-      if (!lightCard || !darkCard) return;
-
-      if (theme === 'dark') {
-        darkCard.style.borderColor = 'var(--primary-red)';
-        darkCard.style.boxShadow = '0 0 0 3px rgba(245,14,6,0.15)';
-        lightCard.style.borderColor = 'var(--card-border, #eee)';
-        lightCard.style.boxShadow = 'none';
-      } else {
-        lightCard.style.borderColor = 'var(--primary-red)';
-        lightCard.style.boxShadow = '0 0 0 3px rgba(245,14,6,0.15)';
-        darkCard.style.borderColor = 'var(--card-border, #eee)';
-        darkCard.style.boxShadow = 'none';
       }
     }
     
     // Globally expose functions
     window.setThemePreference = setThemePreference;
-    window.updateThemeCards = updateThemeCards;
   </script>
 
     <!-- Dark Mode Header Enforcer -->
@@ -536,7 +536,8 @@
     <a href="{{ back_url|default:back_default }}"
       style="color: var(--btn-color, red); text-decoration: none; margin-left:8px; font-weight: bold;">&lt; Back</a>
     <div class="logo"><img src="{% static 'project_review/images/logo.png' %}" alt="Logo"></div>
-    <div class="nav-icons"></div> <!-- Added for theme toggle injection -->
+    <div class="nav-icons" style="display: flex; align-items: center; gap: 15px;">
+    </div> <!-- Added for theme toggle injection -->
   </nav>
 
   <!-- Main Content Area with Dashboard Form -->
@@ -682,32 +683,6 @@
 
         <!-- Column 2: Detailed Info -->
         <div class="right-col">
-          <!-- Display Theme Selection Section -->
-          <div class="form-section">
-            <h2 class="section-title">Display Preferences</h2>
-            <div class="theme-selector" style="display: flex; gap: 20px;">
-              <div class="theme-card" id="theme-light-card" onclick="window.setThemePreference('light')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;">
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <div style="font-weight: 700; font-size: 15px; color: var(--text-color);">Light Mode</div>
-              </div>
-              <div class="theme-card" id="theme-dark-card" onclick="window.setThemePreference('dark')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-                <div style="font-weight: 700; font-size: 15px; color: var(--text-color);">Dark Mode</div>
-              </div>
-            </div>
-          </div>
 
           <div class="form-section">
             <h2 class="section-title">Personal Information</h2>
@@ -953,27 +928,7 @@
       });
     });
 
-    // Initialize theme selection cards on load
-    document.addEventListener('DOMContentLoaded', () => {
-      const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
-      window.updateThemeCards(theme);
-    });
-
-    // Listen for changes
-    window.addEventListener('storage', () => {
-      const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
-       window.updateThemeCards(theme);
-    });
-    
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#theme-toggle');
-      if(btn) {
-        setTimeout(()=>{
-          const theme = window.getColorPreference ? window.getColorPreference() : (localStorage.getItem('theme-preference') || 'light');
-           window.updateThemeCards(theme);
-        }, 150);
-      }
-    });
+    // Initialization removed as it is now handled by Pure CSS [data-theme] selectors
   </script>
   <script src="{% static 'project_review/js/live_updates.js' %}"></script>
 </body>

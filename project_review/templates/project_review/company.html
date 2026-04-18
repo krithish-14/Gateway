@@ -8,6 +8,8 @@
   <title>Strategic Profile - {{ title|default:company_name }}</title>
   <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
   <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+  <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+  <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <style>

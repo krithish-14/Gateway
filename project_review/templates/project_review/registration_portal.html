@@ -8,6 +8,22 @@
     <title>Registration Portal | Gateway</title>
     <link rel="stylesheet" href="{% static 'project_review/css/styles1.css' %}?v=40">
     <link rel="icon" type="image/png" href="{% static 'project_review/images/logo.png' %}">
+    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=50.0"></script>
+    <style>
+        /* Force dark mode background for the specific containers seen in screenshot */
+        [data-theme='dark'] .content-wrap,
+        [data-theme='dark'] body.notif-page-bg,
+        [data-theme='dark'] .notif-list-col > div {
+            background-color: var(--bg-color, #0f172a) !important;
+            color: var(--text-color, #f1f5f9) !important;
+        }
+        [data-theme='dark'] .notif-card-alt,
+        [data-theme='dark'] .notif-list-col > div[style*="background: var(--card-bg, white)"] {
+            background-color: var(--card-bg, #1e293b) !important;
+            border-color: var(--card-border, #334155) !important;
+        }
+    </style>
     <style>
         .status-badge {
             display: inline-block;
@@ -40,16 +56,6 @@
             font-size: 13px;
         }
     </style>
-    <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
-
-    <!-- Dark Mode Header Enforcer -->
-    <style>
-        [data-theme='dark'] .navbar {
-            background-color: #000000 !important;
-            border-bottom: 2px solid #f50e06 !important;
-        }
-    </style>
 </head>
 
 <body class="notif-page-bg">
@@ -80,9 +86,7 @@
                             </div>
                             <div>
                                 <h3 style="margin: 0; font-size: 16px;">{{ item.registration.startup_name }}</h3>
-                                <p style="margin: 2px 0 0 0; color: #64748b; font-size: 12px;">ID: #{{
-                                    item.registration.registration_number }} | Submitted {{
-                                    item.registration.created_at|date:"M d, Y" }}</p>
+                                <p style="margin: 2px 0 0 0; color: #64748b; font-size: 12px;">ID: #{{ item.registration.registration_number }} | Submitted {{ item.registration.created_at|date:"M d, Y" }}</p>
                             </div>
                         </div>
                         <div>
@@ -96,8 +100,7 @@
 
                     <div style="width: 100%; border-top: 1px solid #f1f5f9; padding-top: 10px;">
                         <p style="margin: 0; font-size: 13px; color: var(--sub-text, #475569);">
-                            <strong>Category:</strong> {{ item.registration.category }} | <strong>Target:</strong> {{
-                            item.registration.company_name|default:"General Community" }}
+                            <strong>Category:</strong> {{ item.registration.category }} | <strong>Target:</strong> {{ item.registration.company_name|default:"General Community" }}
                         </p>
                     </div>
 
@@ -108,8 +111,7 @@
                         {% for n in item.notifications %}
                         <div class="approval-card">
                             <p style="margin: 0;"><strong>{{ n.sender_name }}</strong>: {{ n.text }}</p>
-                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #94a3b8;">{{ n.timestamp|date:"F d,
-                                H:i" }}</p>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #94a3b8;">{{ n.timestamp|date:"F d, H:i" }}</p>
                         </div>
                         {% endfor %}
                     </div>

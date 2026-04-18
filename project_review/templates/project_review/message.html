@@ -144,7 +144,7 @@
     }
   </style>
     <script>window.CRM_USER_ID = "{{ user.username|default:'guest' }}";</script>
-    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=1.5"></script>
+    <script src="{% static 'project_review/js/theme_toggle.js' %}?v=20.0"></script>
 </head>
 
 <body>
@@ -164,7 +164,7 @@
 
     <div class="reg-num-box">
       <div style="margin-bottom: 20px;">
-        <span class="reg-label">Registration ID</span>
+        <span class="reg-label">Registration ID (Portal Number)</span>
         <span class="reg-value">{{ registration_number }}</span>
       </div>
       <div>
@@ -174,7 +174,10 @@
     </div>
 
     <div class="actions">
-      <a href="{% url 'project_review:portal' %}" class="btn-action-red">Access Registration Portal</a>
+      {% if registration.verification_completed %}
+      <a href="{% url 'project_review:startup_invoice' %}?id={{ registration.id }}" class="btn-action-red" style="background-color: var(--success-green); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);">Generate Official Invoice</a>
+      {% endif %}
+      <a href="{% url 'project_review:portal' %}" class="btn-action-red" style="margin-top: 10px;">Access Secure Portal</a>
       <a href="{{ back_url }}" class="btn-action-red"
         style="background-color: transparent; border: 2px solid var(--primary-red); color: var(--primary-red); margin-top: 10px;">Return
         to Previous Page</a>
